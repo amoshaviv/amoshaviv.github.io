@@ -35,8 +35,8 @@ const createCircleAnimation = (distanceFromCenter, circleRadius, ray, angle, ste
 	circleAnimation.setAttributeNS(null, 'repeatCount', 'indefinite');
 	circleAnimation.setAttributeNS(null, 'path', `
 			M ${startAnimationCx} ${startAnimationCy} 
-			A ${1},${step} 0 1,0 ${endAnimationCx},${endAnimationCy}
-			A ${1},${step} 0 1,0 ${startAnimationCx},${startAnimationCy}
+			A ${1},${1} 0 1,0 ${endAnimationCx},${endAnimationCy}
+			A ${1},${1} 0 1,0 ${startAnimationCx},${startAnimationCy}
 			`);
 	return circleAnimation;
 }
