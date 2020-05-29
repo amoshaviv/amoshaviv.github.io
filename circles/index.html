@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+
+		<!-- Primary Meta Tags -->
+		<title>Circles in beams</title>
+		<meta name="title" content="Circles in beams">
+		<meta name="description" content="I draw vector graphics circles inscribed in a beam.">
+		<meta name="author" content="Amos Haviv">
+
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://amoshaviv.github.io/circles/">
+		<meta property="og:title" content="Circles in beams">
+		<meta property="og:description" content="I draw vector graphics circles inscribed in a beam.">
+		<meta property="og:image" content="https://amoshaviv.github.io/circles/img/orbits.png">
+
+		<!-- Twitter -->
+		<meta property="twitter:card" content="Circles in beams">
+		<meta property="twitter:url" content="https://amoshaviv.github.io/circles/">
+		<meta property="twitter:title" content="Circles in beams">
+		<meta property="twitter:description" content="I draw vector graphics circles inscribed in a beam.">
+		<meta property="twitter:image" content="https://amoshaviv.github.io/circles/img/orbits.png">	
+
+		<!-- View --> 
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+		<link rel="stylesheet" href="css/dark-mode.css" >
+		<link rel="stylesheet" href="css/styles.css" >
+	</head>
+		<body data-theme="dark">
+			<main class="container">
+					<h1>Circles in beams</h1>
+					<h2>Introduction</h2>
+					<p>
+					I draw vector graphics circles inscribed in a beam. 
+					<br />
+					Implementing those in self executing SVGs is surprisingly straight forward.
+					</p>
+					<h3><a href="svg/beam.svg">Beam</a></h3>
+					<p>
+					A beam is a set of circles inscribed between two lines.
+					The radii of these circles can be calculated using the following formula:
+					$$R(n) = ({1+\sin{\theta \over2} \over 1-\sin{\theta \over2}})R(n-1)$$
+					</p>
+					<p>
+					For instance when \(\theta = {\pi \over 16}\), our beam will look as follows:
+					</p>
+					<a href="svg/beam.svg" class="text-center svg-link"><img alt="Beam" class="img-fluid" src="img/beam.png"/></a>
+					<h3><a href="svg/beams.svg">Beams</a></h3>
+					<p>
+					We can draw multiple beams.
+					</p>
+					<a href="svg/beams.svg" class="text-center svg-link"><img alt="Beams" class="img-fluid" src="img/beams.png" /></a>
+					<h3><a href="svg/grid.svg">Grid</a></h3>
+					<p>
+					If the angle is a fraction of pi, we can create a grid. 
+					<br />
+					If we choose to have \(N\) beams, our angle would be \(\theta = {\pi \over N}\).
+					<br />
+					In the case below, \(N=8\) and \(\theta = {\pi \over 8}\).
+					</p>
+					<a href="svg/grid.svg" class="text-center svg-link"><img alt="Grid" class="img-fluid" src="img/grid.png" /></a>
+					<h3><a href="svg/resolution.svg">Resolution</a></h3>
+					<p>
+					If we decrease the angle of drawing we will have smaller circles and finer beams, doing so increases the resolution of our grid.
+					</p>
+					<a href="svg/resolution.svg" class="text-center svg-link"><img  alt="Resolution" class="img-fluid" src="img/resolution.png" /></a>
+					<h3><a href="svg/alpha.svg">Alpha</a></h3>
+					<p>
+					We can set the alpha channel of each circle's fill color according to their distance from the center.
+					</p>
+					<a href="svg/alpha.svg" class="text-center svg-link"><img  alt="Alpha" class="img-fluid" src="img/alpha.png" /></a>
+					<h3><a href="svg/color.svg">Color</a></h3>
+					<p>
+					We can also set the each circle's fill color according to their distance from the center.
+					</p>
+					<a href="svg/color.svg" class="text-center svg-link"><img  alt="Color" class="img-fluid" src="img/color.png" /></a>
+					<h3><a href="svg/animation.svg">Animation</a></h3>
+					<p>
+					We can now use SVG SMIL animations to make circles animate on a path.
+					</p>
+					<a href="svg/animation.svg" class="text-center svg-link animation-link"><img  alt="Animation" class="img-fluid" src="img/animation.png" /></a>
+					<h3><a href="svg/flower.svg">Flower</a></h3>
+					<p>
+					Tweaking the parameters of this technique allows the generation of some interesting patterns:
+					</p>
+					<a href="svg/flower.svg" class="text-center svg-link animation-link"><img  alt="Flower" class="img-fluid" src="img/flower.png" /></a>
+					<h3><a href="svg/spirals.svg">Spirals</a></h3>
+					<p>
+					Choosing which beams to draw allows you to create other patterns:
+					</p>
+					<a href="svg/spirals.svg" class="text-center svg-link animation-link"><img  alt="Spirals" class="img-fluid" src="img/spirals.png" /></a>
+					<h3><a href="svg/orbits.svg">Orbits</a></h3>
+					<p>
+					And adding another radius to the animation generates interesting orbits:
+					</p>
+					<a href="svg/orbits.svg" class="text-center svg-link animation-link"><img  alt="Orbits" class="img-fluid" src="img/orbits.png" /></a>
+					<h3><a href="svg/ellipse.svg">Ellipse</a></h3>
+					<p>
+					Different parameters create different patterns:
+					</p>
+					<a href="svg/ellipse.svg" class="text-center svg-link animation-link"><img  alt="Ellipse" class="img-fluid" src="img/ellipse.png" /></a>
+					<h3><a href="svg/yy.svg">YY</a></h3>
+					<p>
+					And overlaying them over each other can create familiar patterns:
+					</p>
+					<a href="svg/yy.svg" class="text-center svg-link animation-link"><img  alt="YY" class="img-fluid" src="img/yy.png" /></a>
+					<h3><a href="svg/bubbles.svg">Bubbles</a></h3>
+					<p>
+					Changing the animation parameters leads to some fun outcomes:
+					</p>
+					<a href="svg/bubbles.svg" class="text-center svg-link animation-link"><img  alt="Bubbles" class="img-fluid" src="img/bubbles.png" /></a>
+					<h3><a href="svg/phoenix.svg">Phoenix</a></h3>
+					<p>
+					We can also create asymmetrical animation:
+					</p>
+					<a href="svg/phoenix.svg" class="text-center svg-link animation-link"><img  alt="Phoenix" class="img-fluid" src="img/phoenix.png" /></a>
+					<h3><a href="svg/shell-color.svg">Shell</a></h3>
+					<p>
+					And generally have fun with the results:
+					</p>
+					<a href="svg/shell-color.svg" class="text-center svg-link animation-link"><img  alt="Shell" class="img-fluid" src="img/shell.png" /></a>
+			</main>
+			<footer class="container mt-2"><small>© 2020 Amos Haviv</small></footer>
+			<script src="js/circles.js"></script>
+			<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+			<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/tex-mml-chtml.js"></script>
+		</body>
+</html>

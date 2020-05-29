@@ -1,0 +1,91 @@
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" style="background: #fff;" >
+<script type="text/javascript"><![CDATA[
+	const svgns = "http://www.w3.org/2000/svg";
+	const windowCenterX = window.innerWidth / 2;
+	const windowCenterY = window.innerHeight / 2;
+	const maximumGraphRadius = Math.min(windowCenterX, windowCenterY);
+	const maximumGridRadius = Math.max(windowCenterX, windowCenterY);
+	const minimalRadius = 1; 
+	const n = [	2, 1, 2, 1, 1, 4, 1, 1, 6, 1, 1, 8, 1, 1, 10, 1, 1, 12, 1, 1, 14, 1, 1, 16, 1, 1, 18, 1, 1, 20, 1, 1, 22, 1, 1, 24, 1, 1, 26, 1, 1, 28, 1, 1, 30, 1, 1, 32, 1, 1, 34, 1, 1, 36, 1, 1, 38, 1, 1, 40, 1, 1, 42, 1, 1, 44, 1, 1, 46, 1, 1, 48, 1, 1, 50, 1, 1, 52, 1, 1, 54, 1, 1, 56, 1, 1, 58, 1, 1, 60, 1, 1, 62, 1, 1, 64, 1, 1, 66]
+	const angleRatios = n.map(factor => 1 / factor);
+	const darkMode = true;
+	const svg = document.getElementsByTagName('svg')[0];
+	if (darkMode) svg.setAttribute('style', 'background: black');
+
+
+const getCircleColor = (distanceFromCenter, circleRadius, ray, angle, step) => {
+	const distanceRatio = distanceFromCenter / maximumGraphRadius;
+	const alpha = (1-distanceRatio);
+	const blue = Math.floor(distanceRatio * 255);
+	const red = 255 - Math.min(255, step) - blue; 
+	const green = 255 - Math.min(255, step) - 2 * blue; 
+	return { red, green, blue, alpha: 0.1 };
+}
+
+const createCircleAnimation = (distanceFromCenter, circleRadius, ray, angle, step, cx, cy) => {
+	const circleAnimation = document.createElementNS(svgns, 'animateMotion');
+	const startAnimationCx = cx;
+	const startAnimationCy = cy;
+
+	const endAnimationCx = Math.abs(2 * windowCenterX-cx);
+	const endAnimationCy = Math.abs(2 * windowCenterY-cy);
+
+	circleAnimation.setAttributeNS(null, 'dur', step + 's');
+	circleAnimation.setAttributeNS(null, 'repeatCount', 'indefinite');
+	circleAnimation.setAttributeNS(null, 'path', `
+			M ${startAnimationCx} ${startAnimationCy} 
+			`);
+	return circleAnimation;
+}
+
+const createCircle = (distanceFromCenter, circleRadius, ray, angle, step) => {
+	const circle = document.createElementNS(svgns, 'circle');
+	circle.setAttributeNS(null, 'r', circleRadius);
+	circle.setAttributeNS(null, 'ray', ray);
+	circle.setAttributeNS(null, 'data-step', step);
+
+	const cx = distanceFromCenter * Math.cos(angle * ray) + windowCenterX;
+	const cy = distanceFromCenter * Math.sin(angle * ray) + windowCenterY;
+
+	const color = getCircleColor(distanceFromCenter, circleRadius, ray, angle, step);
+	circle.setAttributeNS(null, 'style', `fill: rgba(${color.red},${color.green},${color.blue}, ${color.alpha});`);
+
+	const circleAnimation = createCircleAnimation(distanceFromCenter, circleRadius, ray, angle, step, cx, cy);
+	circle.appendChild(circleAnimation);
+
+	return circle;
+};
+
+angleRatios.forEach(angleRatio => {
+		const angle = angleRatio * Math.PI;	
+		const realAngle = angle / 2;
+		const squareRootOf2 = Math.sqrt(2);
+		const sinOfRealAngle = Math.sin(angle/2); 
+		const factor = (1+sinOfRealAngle)/(1-sinOfRealAngle);
+		const centerFactor = (1/(squareRootOf2 * sinOfRealAngle));
+		const numberOfRays = 2 / angleRatio;
+
+		let step = 1;
+		let radius = minimalRadius;
+		let center = centerFactor * (radius - 1);
+		let distanceFromCenter = (squareRootOf2 * center); 
+
+		while (distanceFromCenter + radius < maximumGraphRadius) {
+			for (let ray = 0; ray < numberOfRays; ray++) {
+				const circle = createCircle(distanceFromCenter, radius, ray, angle, step);
+				svg.appendChild(circle);
+			}
+
+			step++;
+			radius = radius * factor;
+			center = centerFactor * (radius - 1);
+			distanceFromCenter = (squareRootOf2 * center);
+
+		}
+});
+
+
+]]></script>
+</svg>
