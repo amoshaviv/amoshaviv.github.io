@@ -1,4 +1,4 @@
-export function getCircles(numberOfBeams, maximumSteps) {
+export function getCirclesForNumberOfBeams(numberOfBeams, config) {
   const output = [];
   const angle = Math.PI / numberOfBeams;
   const sinOfAngle = Math.sin(angle);
@@ -7,12 +7,14 @@ export function getCircles(numberOfBeams, maximumSteps) {
   let distanceFromCenter = 1 / (1 + sinOfAngle);
   let radius = sinOfAngle / (1 + sinOfAngle);
 
-  for (let step = 0; step < maximumSteps; step++) {
-    for (let beam = 0; beam < numberOfBeams; beam++) {
+  const maximumNumberOfBeams = config.maximumBeams ? Math.min(config.maximumBeams, numberOfBeams) : numberOfBeams;
+
+  for (let ring = 0; ring < config.maximumRings; ring++) {
+    for (let beam = 0; beam < maximumNumberOfBeams; beam++) {
       const cx = 1 + distanceFromCenter * Math.cos(angle * 2 * beam);
       const cy = 1 + distanceFromCenter * Math.sin(angle * 2 * beam);
 
-      output.push({ cy, cx, radius, beam, angle, step, distanceFromCenter });
+      output.push({ cy, cx, radius, beam, angle, ring, numberOfBeams, distanceFromCenter });
     }
 
     radius = radius * factor;

@@ -5,30 +5,37 @@ const gridLines = getGridLines();
 
 const styles = (theme) => ({
   line: {
-    "&:hover": {
-      stroke: "red",
-      strokeWidth: 0.01,
-    },
+    
+  },
+  text: {
+    letterSpacing: "normal",
   },
 });
 
 function Grid({ classes }) {
   return (
     <>
-      {gridLines.map((gridLine) => (
-        <>
+      {gridLines.map((gridLine, idx) => ([
           <line
+            key={`grid-line-${idx}`}
             x1={gridLine.x1}
             y1={gridLine.y1}
             x2={gridLine.x2}
             y2={gridLine.y2}
             stroke="rgba(0,0,0,0.2)"
-            stroke-width="0.001"
+            strokeWidth="0.001"
             className={classes.line}
-          />
-          <text x={gridLine.x1} y={gridLine.y1} font-size="0.05">{gridLine.x1}|{gridLine.y1}</text>
-        </>
-      ))}
+          />,
+          <text
+            key={`grid-line-text-${idx}`}
+            className={classes.text}
+            x={gridLine.x1}
+            y={2 - gridLine.y1}
+            fontSize="0.02"
+          >
+            {((gridLine.y1 || gridLine.x1) - 1).toFixed(2)}
+          </text>
+      ]))}
       )}
     </>
   );
