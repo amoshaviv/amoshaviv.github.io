@@ -4,7 +4,7 @@ import TextField from "@material-ui/core/TextField"
 
 function Toolbar(setConfig) {
   return (
-    <Box mt={1} id="toolbar">
+    <Box mt={1} mb={1} id="toolbar">
       <TextField fullWidth label="Number Of Beams" variant="outlined" />
     </Box>
   );
