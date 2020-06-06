@@ -12,9 +12,10 @@
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1"
   },
+  "homepage": "/c/",
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && rm -rf ../c && mv build ../c",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
