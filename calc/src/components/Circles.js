@@ -1,6 +1,5 @@
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
-import Tooltip from '@material-ui/core/Tooltip';
 
 const styles = (theme) => ({
   circle: {
@@ -12,10 +11,6 @@ const styles = (theme) => ({
 
 function Circles({ circles, classes }) {
   return circles.map((circle) => (
-    <Tooltip
-      title={`b: ${(circle.beam+1).toFixed(0)}/${circle.numberOfBeams} | d: ${circle.distanceFromCenter} | cx: ${(circle.cx-1).toFixed(3)} | cy: ${(1-circle.cy).toFixed(3)} | r: ${(circle.ring).toFixed(0)} | rad: ${(circle.radius).toFixed(4)}`}
-      aria-label={`circle-a${circle.numberOfBeams}-b${circle.beam}-r${circle.ring}`}
-    >
       <circle
         className={classes.circle}
         key={`circle-a${circle.numberOfBeams}-b${circle.beam}-r${circle.ring}`}
@@ -24,7 +19,6 @@ function Circles({ circles, classes }) {
         cy={circle.cy}
         r={circle.radius}
       />
-    </Tooltip>
   ));
 }
 

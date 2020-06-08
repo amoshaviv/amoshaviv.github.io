@@ -1,13 +1,39 @@
-import React, { useRef } from "react";
+import React, { useState, useRef } from "react";
 import Grid from "./Grid";
 import Circles from "./Circles";
+import Tooltip from "./Tooltip";
 
 function Graph({ config, circles }) {
   const svg = useRef(null);
+  const [clickLocation, setClickLocation] = useState(null);
+
+  const handleBlur = (ev) => {
+    setClickLocation(null);
+  }
+
+  const handleClick = (ev) => {
+    const rect = ev.currentTarget.getBoundingClientRect();
+    const x = (ev.clientX - rect.left) / rect.width; 
+    const y = (ev.clientY - rect.top) / rect.height;
+    
+
+    setClickLocation({ x,y });
+    
+    //  Prevent default
+    ev.preventDefault();
+    ev.stopPropagation();
+  };
 
   return (
-    <svg viewBox="0 0 2 2" xmlns="http://www.w3.org/2000/svg" ref={svg}>
+    <svg
+      onBlur={handleBlur}
+      onClick={handleClick}
+      viewBox="0 0 2 2"
+      xmlns="http://www.w3.org/2000/svg"
+      ref={svg}
+    >
       <Circles circles={circles} />
+      {clickLocation && <Tooltip clickLocation={clickLocation}/>}
       <Grid />
     </svg>
   );
