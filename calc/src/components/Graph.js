@@ -6,9 +6,14 @@ import Tooltip from "./Tooltip";
 function Graph({ config, circles }) {
   const svg = useRef(null);
   const [clickLocation, setClickLocation] = useState(null);
+  const [hoveredCircle, setHoveredCircle] = useState(null);
 
   const handleBlur = (ev) => {
     setClickLocation(null);
+  }
+
+  const onCircleClick = (circle) => {
+      setHoveredCircle(circle);
   }
 
   const handleClick = (ev) => {
@@ -32,9 +37,9 @@ function Graph({ config, circles }) {
       xmlns="http://www.w3.org/2000/svg"
       ref={svg}
     >
-      <Circles circles={circles} />
-      {clickLocation && <Tooltip clickLocation={clickLocation}/>}
-      <Grid />
+      <Circles circles={circles} onCircleClick={onCircleClick} />
+      {clickLocation && <Tooltip hoveredCircle={hoveredCircle} clickLocation={clickLocation}/>}
+      {/* <Grid /> */}
     </svg>
   );
 }

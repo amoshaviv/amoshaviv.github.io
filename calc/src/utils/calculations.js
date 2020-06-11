@@ -1,3 +1,17 @@
+const shouldCreateCircle = (config, ring, beam) => {
+  if (!config.rings) return true;
+  if (config.rings) {
+    for (let ringFilter of config.rings) {
+      if (Array.isArray(ringFilter)) {
+        if (ring > ringFilter[0] && ring < ringFilter[1]) return true;
+      }
+      if (!isNaN(ringFilter) && ringFilter === ring) return true;
+    }
+  }
+
+  return false;
+};
+
 export function getCirclesForNumberOfBeams(numberOfBeams, config) {
   const output = [];
   const angle = Math.PI / numberOfBeams;
@@ -7,18 +21,33 @@ export function getCirclesForNumberOfBeams(numberOfBeams, config) {
   let distanceFromCenter = 1 / (1 + sinOfAngle);
   let radius = sinOfAngle / (1 + sinOfAngle);
 
-  const maximumNumberOfBeams = config.maximumBeams ? Math.min(config.maximumBeams, numberOfBeams) : numberOfBeams;
+  const maximumNumberOfBeams = config.maximumBeams
+    ? Math.min(config.maximumBeams, numberOfBeams)
+    : numberOfBeams;
 
-  for (let ring = 0; ring < config.maximumRings; ring++) {
+  let ring = 0;
+  while (radius > 0.000001) {
     for (let beam = 0; beam < maximumNumberOfBeams; beam++) {
-      const cx = 1 + distanceFromCenter * Math.cos(angle * 2 * beam);
-      const cy = 1 + distanceFromCenter * Math.sin(angle * 2 * beam);
+      if (shouldCreateCircle(config, ring, beam)) {
+        const cx = 1 + distanceFromCenter * Math.cos(angle * 2 * beam);
+        const cy = 1 + distanceFromCenter * Math.sin(angle * 2 * beam);
 
-      output.push({ cy, cx, radius, beam, angle, ring, numberOfBeams, distanceFromCenter });
+        output.push({
+          cy,
+          cx,
+          radius,
+          beam,
+          angle,
+          ring,
+          numberOfBeams,
+          distanceFromCenter,
+        });
+      }
     }
 
     radius = radius * factor;
     distanceFromCenter = distanceFromCenter * factor;
+    ring++;
   }
 
   return output;

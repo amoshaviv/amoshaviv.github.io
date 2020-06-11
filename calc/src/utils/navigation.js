@@ -34,9 +34,23 @@ export function parseConfigFromQueryString() {
       output.rings = querystring.rings
         .split(",")
         .map((ring) => {
+            console.log(ring)
+          if (ring.indexOf("-") > -1) {
+            const range = ring
+              .split("-")
+              .map((ring) => Number.parseInt(ring))
+              .filter((ring) => !isNaN(ring));
+            if (range.length === 2) return range;
+          }
+
           return Number.parseInt(ring);
         })
-        .filter((ring) => !isNaN(ring));
+        .filter((ring) => { 
+            if(Array.isArray(ring)) return true;
+            return !isNaN(ring)
+        });
+
+        console.log(output.rings);
     }
   }
 
