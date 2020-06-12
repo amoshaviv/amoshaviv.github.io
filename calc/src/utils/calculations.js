@@ -3,7 +3,7 @@ const shouldCreateCircle = (config, ring, beam) => {
   if (config.rings) {
     for (let ringFilter of config.rings) {
       if (Array.isArray(ringFilter)) {
-        if (ring > ringFilter[0] && ring < ringFilter[1]) return true;
+        if (ring >= ringFilter[0] && ring <= ringFilter[1]) return true;
       }
       if (!isNaN(ringFilter) && ringFilter === ring) return true;
     }

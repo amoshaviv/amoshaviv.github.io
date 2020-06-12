@@ -1,0 +1,123 @@
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg viewBox="0 0 2 2" version="1.1" 
+	 xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+<script type="text/javascript"><![CDATA[
+	const svgns = "http://www.w3.org/2000/svg";
+	const windowCenterX = window.innerWidth / 2;
+	const windowCenterY = window.innerHeight / 2;
+	const maximumGraphRadius = Math.min(windowCenterX, windowCenterY);
+	const maximumGridRadius = Math.max(windowCenterX, windowCenterY);
+	const minimalRadius = 1; 
+	const beams = [35];
+	const darkMode = true;
+	const svg = document.getElementsByTagName('svg')[0];
+	if (darkMode) svg.setAttribute('style', 'background: black');
+
+
+const getCircleColor = (circle) => {
+	const alpha = 1.5 - circle.distanceFromCenter;
+	const blue = Math.floor(circle.distanceFromCenter * 255);
+	const red = 255 - Math.min(255, circle.ring) - blue; 
+	const green = 255 - Math.min(255, circle.ring) - 2 * blue; 
+	return { red, green, blue, alpha };
+}
+
+
+const getPathElementId = (circle) => `path${circle.numberOfBeams}-${circle.beam}-${circle.ring}`;
+
+const getPath = (circle) => { 
+	return `
+			M ${0} ${0} 
+			A ${1/2} ${1/2} 0 1,0 ${1-circle.cx} ${1-circle.cy}
+			A ${1/2} ${1/2} 0 1,0 ${0} ${0}
+
+	`;
+}
+
+const createCircleAnimation = (circle) => {
+	const circleAnimation = document.createElementNS(svgns, 'animateMotion');
+	
+	circleAnimation.setAttributeNS(null, 'dur', '10s');
+	circleAnimation.setAttributeNS(null, 'reverse', 'auto');
+	circleAnimation.setAttributeNS(null, 'repeatCount', 'indefinite');
+	circleAnimation.setAttributeNS(null, 'path', getPath(circle));
+
+	return circleAnimation;
+}
+
+const createCirclePathElement = (circle) => {
+	const circlePathElement = document.createElementNS(svgns, 'path');
+	circlePathElement.setAttributeNS(null, 'id', getPathElementId(circle));
+	circlePathElement.setAttributeNS(null, 'stroke', 'rgba(255, 255, 255, 1)');
+	circlePathElement.setAttributeNS(null, 'stroke-width', '0.0001');
+	circlePathElement.setAttributeNS(null, 'fill', 'transparent');
+	circlePathElement.setAttributeNS(null, 'd', getPath(circle));
+	return circlePathElement;
+}
+
+const createCircle = (circle) => {
+	const circleElement = document.createElementNS(svgns, 'circle');
+	circleElement.setAttributeNS(null, 'r', circle.radius);
+
+	const color = getCircleColor(circle);
+	circleElement.setAttributeNS(null, 'cx', circle.cx);
+ 	circleElement.setAttributeNS(null, 'cy', circle.cy);
+	circleElement.setAttributeNS(null, 'style', `fill: rgba(${color.red},${color.green},${color.blue}, ${color.alpha});`);
+
+  	const circleAnimation = createCircleAnimation(circle);
+   	circleElement.appendChild(circleAnimation);
+
+	return circleElement;
+};
+
+function getCirclesForNumberOfBeams(numberOfBeams) {
+  const output = [];
+  const angle = Math.PI / numberOfBeams;
+  const sinOfAngle = Math.sin(angle);
+  const factor = (1 - sinOfAngle) / (1 + sinOfAngle);
+
+  let distanceFromCenter = 1 / (1 + sinOfAngle);
+  let radius = sinOfAngle / (1 + sinOfAngle);
+
+  const maximumNumberOfBeams = numberOfBeams
+
+  let ring = 0;
+  let exitTerm = true;
+  while (radius > 0.0001 && exitTerm) {
+    for (let beam = 0; beam < maximumNumberOfBeams; beam++) {
+        const cx = 1 + distanceFromCenter * Math.cos(angle * 2 * beam);
+        const cy = 1 + distanceFromCenter * Math.sin(angle * 2 * beam);
+
+        output.push({
+          cy,
+          cx,
+          radius,
+          beam,
+          angle,
+          ring,
+          numberOfBeams,
+          distanceFromCenter,
+        });
+    }
+
+    radius = radius * factor;
+    distanceFromCenter = distanceFromCenter * factor;
+    ring++;
+  }
+
+  return output;
+}
+
+beams.forEach(numberOfBeams => {
+	const circles = getCirclesForNumberOfBeams(numberOfBeams);
+	circles.forEach(circle => {
+//		svg.appendChild(createCirclePathElement(circle));
+		svg.appendChild(createCircle(circle));
+	});
+});
+
+
+]]></script>
+</svg>
