@@ -10,7 +10,7 @@
 	const maximumGraphRadius = Math.min(windowCenterX, windowCenterY);
 	const maximumGridRadius = Math.max(windowCenterX, windowCenterY);
 	const minimalRadius = 1; 
-	const beams = [35];
+	const beams = [72];
 	const darkMode = true;
 	const svg = document.getElementsByTagName('svg')[0];
 	if (darkMode) svg.setAttribute('style', 'background: black');
@@ -29,18 +29,16 @@ const getPathElementId = (circle) => `path${circle.numberOfBeams}-${circle.beam}
 
 const getPath = (circle) => { 
 	return `
-			M ${0} ${0} 
-			A ${1/2} ${1/2} 0 1,0 ${1-circle.cx} ${1-circle.cy}
-			A ${1/2} ${1/2} 0 1,0 ${0} ${0}
-
+			M ${circle.cx} ${circle.cy} 
+			A ${circle.distanceFromCenter} ${circle.distanceFromCenter} 0 1,0 ${2-circle.cx} ${2-circle.cy}
+			A ${circle.distanceFromCenter} ${circle.distanceFromCenter} 0 1,0 ${circle.cx} ${circle.cy}
 	`;
 }
 
 const createCircleAnimation = (circle) => {
 	const circleAnimation = document.createElementNS(svgns, 'animateMotion');
 	
-	circleAnimation.setAttributeNS(null, 'dur', '10s');
-	circleAnimation.setAttributeNS(null, 'reverse', 'auto');
+	circleAnimation.setAttributeNS(null, 'dur', circle.radius * 1000 + 's');
 	circleAnimation.setAttributeNS(null, 'repeatCount', 'indefinite');
 	circleAnimation.setAttributeNS(null, 'path', getPath(circle));
 
@@ -49,11 +47,13 @@ const createCircleAnimation = (circle) => {
 
 const createCirclePathElement = (circle) => {
 	const circlePathElement = document.createElementNS(svgns, 'path');
+	
 	circlePathElement.setAttributeNS(null, 'id', getPathElementId(circle));
 	circlePathElement.setAttributeNS(null, 'stroke', 'rgba(255, 255, 255, 1)');
 	circlePathElement.setAttributeNS(null, 'stroke-width', '0.0001');
 	circlePathElement.setAttributeNS(null, 'fill', 'transparent');
 	circlePathElement.setAttributeNS(null, 'd', getPath(circle));
+
 	return circlePathElement;
 }
 
@@ -62,8 +62,8 @@ const createCircle = (circle) => {
 	circleElement.setAttributeNS(null, 'r', circle.radius);
 
 	const color = getCircleColor(circle);
-	circleElement.setAttributeNS(null, 'cx', circle.cx);
- 	circleElement.setAttributeNS(null, 'cy', circle.cy);
+//	circleElement.setAttributeNS(null, 'cx', circle.cx);
+// 	circleElement.setAttributeNS(null, 'cy', circle.cy);
 	circleElement.setAttributeNS(null, 'style', `fill: rgba(${color.red},${color.green},${color.blue}, ${color.alpha});`);
 
   	const circleAnimation = createCircleAnimation(circle);
@@ -85,7 +85,7 @@ function getCirclesForNumberOfBeams(numberOfBeams) {
 
   let ring = 0;
   let exitTerm = true;
-  while (radius > 0.0001 && exitTerm) {
+  while (radius > 0.01 && exitTerm) {
     for (let beam = 0; beam < maximumNumberOfBeams; beam++) {
         const cx = 1 + distanceFromCenter * Math.cos(angle * 2 * beam);
         const cy = 1 + distanceFromCenter * Math.sin(angle * 2 * beam);
