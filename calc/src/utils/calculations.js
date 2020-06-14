@@ -1,15 +1,29 @@
 const shouldCreateCircle = (config, ring, beam) => {
-  if (!config.rings) return true;
-  if (config.rings) {
-    for (let ringFilter of config.rings) {
+  let output = false;
+  let inRingFilters = false;
+  let inBeamFilters = false;
+  
+  if (!config.ringsConfig) inRingFilters = true;
+  if (config.ringsConfig) {
+    for (let ringFilter of config.ringsConfig) {
       if (Array.isArray(ringFilter)) {
-        if (ring >= ringFilter[0] && ring <= ringFilter[1]) return true;
+        if (ring >= ringFilter[0] && ring <= ringFilter[1]) inRingFilters = true;
       }
-      if (!isNaN(ringFilter) && ringFilter === ring) return true;
+      if (!isNaN(ringFilter) && ringFilter === ring) inRingFilters = true;
     }
   }
 
-  return false;
+  if (!config.beamsConfig) inBeamFilters = true;
+  if (config.beamsConfig) {
+    for (let beamFilter of config.beamsConfig) {
+      if (Array.isArray(beamFilter)) {
+        if (beam >= beamFilter[0] && beam <= beamFilter[1]) inBeamFilters = true;
+      }
+      if (!isNaN(beamFilter) && beamFilter === beam) inBeamFilters = true;
+    }
+  }
+
+  return inRingFilters && inBeamFilters;
 };
 
 export function getCirclesForNumberOfBeams(numberOfBeams, config) {

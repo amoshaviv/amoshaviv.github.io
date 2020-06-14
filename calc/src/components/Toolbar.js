@@ -3,7 +3,7 @@ import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
-import { getRingFiltersText } from '../utils/svg';
+import { getFiltersText } from '../utils/svg';
 
 function Toolbar({ setConfig, config }) {
   const handleSubmit = (ev) => {
@@ -11,13 +11,14 @@ function Toolbar({ setConfig, config }) {
   };
 
   const beamsText = config.beams ? config.beams.join(',') : '';
-  const ringsText = getRingFiltersText(config.rings);
+  const ringsConfigText = getFiltersText(config.ringsConfig);
+  const beamsConfigText = getFiltersText(config.beamsConfig);
 
   return (
     <Box pt={2} pb={1}>
       <form method="get" id="toolbar">
         <Grid container spacing={1}>
-          <Grid item xs={12} sm={12} md={3} lg={3}>
+          <Grid item xs={12} sm={12} md={4} lg={4}>
             <TextField
               id="beams"
               name="beams"
@@ -27,33 +28,23 @@ function Toolbar({ setConfig, config }) {
               variant="outlined"
             />
           </Grid>
-          <Grid item xs={12} sm={12} md={3} lg={3}>
+          <Grid item xs={12} sm={12} md={4} lg={4}>
             <TextField
-              id="rings"
-              name="rings"
+              id="ringsConfig"
+              name="ringsConfig"
               fullWidth
-              label="Rings"
-              defaultValue={ringsText}
+              label="Rings Config"
+              defaultValue={ringsConfigText}
               variant="outlined"
             />
           </Grid>
-          <Grid item xs={12} sm={12} md={3} lg={3}>
+          <Grid item xs={12} sm={12} md={4} lg={4}>
             <TextField
-              id="maximumRings"
-              name="maximumRings"
+              id="beamsConfig"
+              name="beamsConfig"
               fullWidth
-              label="Maximum Rings"
-              defaultValue={config.maximumRings}
-              variant="outlined"
-            />
-          </Grid>
-          <Grid item xs={12} sm={12} md={3} lg={3}>
-            <TextField
-              id="maximumBeams"
-              name="maximumBeams"
-              fullWidth
-              label="Maximum Beams"
-              defaultValue={config.maximumBeams}
+              label="Beams Config"
+              defaultValue={beamsConfigText}
               variant="outlined"
             />
           </Grid>

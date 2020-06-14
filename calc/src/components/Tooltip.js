@@ -32,9 +32,9 @@ function Tooltip({ clickLocation, hoveredCircle, classes }) {
       strokeWidth="0.002"
       ref={tooltipText}
     >
-        <tspan x={textX} dy="1.2em">x: {(clickLocation.x * 2 - 1).toFixed(4)}</tspan>
-        <tspan x={textX} dy="1.2em">y: {(1  - clickLocation.y * 2).toFixed(4)}</tspan>
-        {hoveredCircle && <tspan x={textX} dy="1.2em">Circle: {hoveredCircle.beam}/{hoveredCircle.numberOfBeams}</tspan>}
+        x: {(clickLocation.x * 2 - 1).toFixed(4)} | 
+        y: {(1  - clickLocation.y * 2).toFixed(4)} | 
+        {hoveredCircle && `c: ${hoveredCircle.beam}/${hoveredCircle.numberOfBeams}`}
     </text>,
   ];
 }

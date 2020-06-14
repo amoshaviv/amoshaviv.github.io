@@ -17,21 +17,9 @@ export function parseConfigFromQueryString() {
         .filter((beam) => !isNaN(beam));
     }
 
-    // Parse maximum beams to display
-    if (querystring.maximumBeams) {
-      const parsedMaximumBeams = Number.parseInt(querystring.maximumBeams);
-      if (!isNaN(parsedMaximumBeams)) output.maximumBeams = parsedMaximumBeams;
-    }
-
-    // Parse maximum rings
-    if (querystring.maximumRings) {
-      const parsedMaximumRings = Number.parseInt(querystring.maximumRings);
-      if (!isNaN(parsedMaximumRings)) output.maximumRings = parsedMaximumRings;
-    }
-
     // Parse rings configuration
-    if (querystring.rings) {
-      output.rings = querystring.rings
+    if (querystring.ringsConfig) {
+      output.ringsConfig = querystring.ringsConfig
         .split(",")
         .map((ring) => {
             console.log(ring)
@@ -49,8 +37,28 @@ export function parseConfigFromQueryString() {
             if(Array.isArray(ring)) return true;
             return !isNaN(ring)
         });
+    }
 
-        console.log(output.rings);
+    // Parse rings configuration
+    if (querystring.beamsConfig) {
+      output.beamsConfig = querystring.beamsConfig
+        .split(",")
+        .map((beam) => {
+            console.log(beam)
+          if (beam.indexOf("-") > -1) {
+            const range = beam
+              .split("-")
+              .map((beam) => Number.parseInt(beam))
+              .filter((beam) => !isNaN(beam));
+            if (range.length === 2) return range;
+          }
+
+          return Number.parseInt(beam);
+        })
+        .filter((beam) => { 
+            if(Array.isArray(beam)) return true;
+            return !isNaN(beam)
+        });
     }
   }
 

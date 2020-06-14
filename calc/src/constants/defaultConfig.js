@@ -37,5 +37,6 @@ const getPrimes = () => {
 
 export default {
   beams: getPrimes(),
-  rings: [[1,20]],
+  ringsConfig: [[0,20]],
+  beamsConfig: [[0,20]],
 };
