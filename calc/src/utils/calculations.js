@@ -2,12 +2,13 @@ const shouldCreateCircle = (config, ring, beam) => {
   let output = false;
   let inRingFilters = false;
   let inBeamFilters = false;
-  
+
   if (!config.ringsConfig) inRingFilters = true;
   if (config.ringsConfig) {
     for (let ringFilter of config.ringsConfig) {
       if (Array.isArray(ringFilter)) {
-        if (ring >= ringFilter[0] && ring <= ringFilter[1]) inRingFilters = true;
+        if (ring >= ringFilter[0] && ring <= ringFilter[1])
+          inRingFilters = true;
       }
       if (!isNaN(ringFilter) && ringFilter === ring) inRingFilters = true;
     }
@@ -17,7 +18,8 @@ const shouldCreateCircle = (config, ring, beam) => {
   if (config.beamsConfig) {
     for (let beamFilter of config.beamsConfig) {
       if (Array.isArray(beamFilter)) {
-        if (beam >= beamFilter[0] && beam <= beamFilter[1]) inBeamFilters = true;
+        if (beam >= beamFilter[0] && beam <= beamFilter[1])
+          inBeamFilters = true;
       }
       if (!isNaN(beamFilter) && beamFilter === beam) inBeamFilters = true;
     }
@@ -27,6 +29,7 @@ const shouldCreateCircle = (config, ring, beam) => {
 };
 
 export function getCirclesForNumberOfBeams(numberOfBeams, config) {
+  let area = 0;
   const output = [];
   const angle = Math.PI / numberOfBeams;
   const sinOfAngle = Math.sin(angle);
@@ -40,7 +43,8 @@ export function getCirclesForNumberOfBeams(numberOfBeams, config) {
     : numberOfBeams;
 
   let ring = 0;
-  while (radius > 0.000001) {
+  while (radius > 0.0000001) {
+    area += numberOfBeams * (Math.PI * radius * radius);
     for (let beam = 0; beam < maximumNumberOfBeams; beam++) {
       if (shouldCreateCircle(config, ring, beam)) {
         const cx = 1 + distanceFromCenter * Math.cos(angle * 2 * beam);
@@ -64,7 +68,8 @@ export function getCirclesForNumberOfBeams(numberOfBeams, config) {
     ring++;
   }
 
-  return output;
+  console.log(area);
+  return [];
 }
 
 export function getGridLines() {

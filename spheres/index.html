@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Sphere</title>
+		<meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <script src="https://threejs.org/build/three.min.js"></script>
+        <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+	</head>
+
+	<body style="padding: 0; margin: 0;">
+		<script type="module">
+            let  camera, controls, scene, renderer;
+            
+            init();           
+            animate();
+
+            export function getSpheresForNumberOfBeams(numberOfBeams) {
+                let area = 0;
+                const output = [];
+                const angle = Math.PI / numberOfBeams;
+                const sinOfAngle = Math.sin(angle);
+                const cosOfAngle = Math.cos(angle);
+                const factor = (1 - sinOfAngle) / (1 + sinOfAngle);
+
+                let sphereRadius = 100;
+                let radius = sphereRadius * sinOfAngle / (1 + sinOfAngle);
+                let distanceFromCenter = radius / sinOfAngle;
+
+                while (radius > 0.1) {
+                    area += numberOfBeams * (Math.PI * radius * radius);
+                    for (let beam = 0; beam < numberOfBeams; beam++) {
+                        for (let plane = 0; plane < 1 ; plane++) {
+                            const cx = distanceFromCenter * Math.cos(2 * angle * plane) * Math.sin(2 * angle * beam);
+                            const cy = distanceFromCenter * Math.sin(2 * angle * plane) * Math.sin(2 * angle * beam);
+                            const cz = distanceFromCenter * Math.cos(2 * angle * beam);
+                            const circle =  {
+                                cy,
+                                cx,
+                                cz,
+                                radius,
+                                angle,
+                                beam,
+                                numberOfBeams,
+                                distanceFromCenter,
+                            };
+
+                            output.push(circle);
+                            // if (beam === 0) {
+                            //     const extraCircle = Object.assign({}, circle);
+                            //     extraCircle.cx = 0;
+                            //     extraCircle.cy = distanceFromCenter;
+                            //     extraCircle.cz = 0;
+                            //     output.push(extraCircle);
+                            // }
+                        }
+                    }
+
+                    radius = radius * factor;
+                    distanceFromCenter = distanceFromCenter * factor;
+                }
+
+                console.log(area);
+                return output;
+            }
+
+
+            function init() {
+                const spheres = getSpheresForNumberOfBeams(9);  
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color( 0x111111 );
+                // scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
+
+                renderer = new THREE.WebGLRenderer( { antialias: false } );
+                renderer.setPixelRatio( window.devicePixelRatio );
+                renderer.setSize( window.innerWidth, window.innerHeight );
+                document.body.appendChild( renderer.domElement );
+
+                camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+                camera.position.set( 400, 200, 0 );
+
+                // controls
+
+                controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+                controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
+
+                // controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+                //controls.dampingFactor = 0.05;
+
+                // controls.screenSpacePanning = false;
+
+                controls.minDistance = 5;
+                controls.maxDistance = 500;
+
+                controls.maxPolarAngle = Math.PI;
+
+                // world
+
+                let material = new THREE.MeshPhongMaterial( { color: 0xffffff, transparent: true, opacity: 0.5 } );
+                let basicMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, transparent: true, opacity: 0.9 } );
+
+                spheres.forEach(sphereObj => {
+                    let geometry = new THREE.SphereGeometry( sphereObj.radius, 32, 32 );
+                    let sphere = new THREE.Mesh( geometry, material );
+                    sphere.position.x = sphereObj.cx;
+                    sphere.position.y = sphereObj.cy;
+                    sphere.position.z = sphereObj.cz;
+                    sphere.updateMatrix();
+                    sphere.matrixAutoUpdate = false;
+                    scene.add( sphere );
+                })
+
+                // lights
+
+                let light1 = new THREE.DirectionalLight( 0xffffff );
+                light1.position.set( 0, 10, 0 );
+                scene.add( light1 );
+
+                let light2 = new THREE.DirectionalLight( 0xffffff );
+                light2.position.set( 0, -10, 0 );
+                scene.add( light2 );
+
+                window.addEventListener( 'resize', onWindowResize, false );
+
+            }
+
+            function onWindowResize() {
+
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+
+                renderer.setSize( window.innerWidth, window.innerHeight );
+
+            }
+
+            function animate() {
+
+                // requestAnimationFrame( animate );
+
+                // controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
+
+                render();
+
+            }
+
+            function render() {
+
+                renderer.render( scene, camera );
+
+            }
+		</script>
+	</body>
+</html>

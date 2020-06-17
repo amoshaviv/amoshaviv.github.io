@@ -37,6 +37,7 @@ function Graph({ config, circles }) {
       xmlns="http://www.w3.org/2000/svg"
       ref={svg}
     >
+      <circle cx="1" cy="1" r="1" fill="#fefefe" />
       <Circles circles={circles} onCircleClick={onCircleClick} />
       {clickLocation && <Tooltip hoveredCircle={hoveredCircle} clickLocation={clickLocation}/>}
       {/* <Grid /> */}
