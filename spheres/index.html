@@ -28,15 +28,14 @@
                 let sphereRadius = 100;
                 let radius = sphereRadius * sinOfAngle / (1 + sinOfAngle);
                 let distanceFromCenter = radius / sinOfAngle;
-                const angles = [0];
-                while (radius > 0.08) {
+                const angles = [0, 1, 2, 3, 4, 5];
+                while (radius > 1) {
                     angles.forEach(skewAngle => {
                         area += numberOfBeams * (Math.PI * radius * radius);
-                        for (let beam = 0; beam < numberOfBeams; beam++) {
-                            const cx = distanceFromCenter * Math.cos(2 * angle * skewAngle) * Math.sin(2 * angle * beam);
-                            const cy = distanceFromCenter * Math.sin(2 * angle * skewAngle) * Math.sin(2 * angle * beam);
+                        for (let beam = 0; beam <= numberOfBeams / 2; beam++) {
+                            const cx = distanceFromCenter * Math.cos(6 * skewAngle * Math.PI / numberOfBeams) * Math.sin(2 * angle * beam);
+                            const cy = distanceFromCenter * Math.sin(6 * skewAngle * Math.PI / numberOfBeams) * Math.sin(2 * angle * beam);
                             const cz = distanceFromCenter * Math.cos(2 * angle * beam);
-                            console.log(cx, cy, cz);
                             const circle =  {
                                 cy,
                                 cx,
@@ -49,17 +48,18 @@
                             };
 
                             output.push(circle);
-                            // if (beam === 0) {
+                            // if (beam % 4 === 0) {
                             //     const extraCircle = Object.assign({}, circle);
-                            //     extraCircle.cx = distanceFromCenter * Math.cos(2 * angle) * Math.sin(2 * angle * beam);
-                            //     extraCircle.cy = distanceFromCenter * Math.sin(2 * angle) * Math.sin(2 * angle * beam);
-                            //     extraCircle.cz = distanceFromCenter * Math.cos(2 * angle);
+                            //     let beamAngle = 6 * angle * beam;
+                            //     let tiltAngle = 6 * skewAngle * Math.PI / numberOfBeams + (Math.PI / 2);
+                            //     extraCircle.cx = distanceFromCenter * Math.cos(tiltAngle) * Math.sin(beamAngle);
+                            //     extraCircle.cy = distanceFromCenter * Math.sin(tiltAngle) * Math.sin(beamAngle);
+                            //     extraCircle.cz = distanceFromCenter * Math.cos(beamAngle);
                             //     output.push(extraCircle);
                             // }
                         }
                     });
-
-
+                    
                     radius = radius * factor;
                     distanceFromCenter = distanceFromCenter * factor;
                     step++;
@@ -71,7 +71,7 @@
 
 
             function init() {
-                const spheres = getSpheresForNumberOfBeams(17);  
+                const spheres = getSpheresForNumberOfBeams(18);  
                 scene = new THREE.Scene();
                 scene.background = new THREE.Color( 0x111111 );
                 // scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
@@ -118,6 +118,7 @@
                     sphere.updateMatrix();
                     sphere.matrixAutoUpdate = false;
                     geometry.center();
+                    sphere.addEventListener( 'click', (ev) => sphere.visible = false );
                     scene.add( sphere );
                 })
 
