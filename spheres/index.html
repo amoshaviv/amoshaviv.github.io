@@ -33,8 +33,8 @@
                     angles.forEach(skewAngle => {
                         area += numberOfBeams * (Math.PI * radius * radius);
                         for (let beam = 0; beam <= numberOfBeams / 2; beam++) {
-                            const cx = distanceFromCenter * Math.cos(6 * skewAngle * Math.PI / numberOfBeams) * Math.sin(2 * angle * beam);
-                            const cy = distanceFromCenter * Math.sin(6 * skewAngle * Math.PI / numberOfBeams) * Math.sin(2 * angle * beam);
+                            const cx = distanceFromCenter * Math.cos(4 * skewAngle * Math.PI / numberOfBeams) * Math.sin(2 * angle * beam);
+                            const cy = distanceFromCenter * Math.sin(4 * skewAngle * Math.PI / numberOfBeams) * Math.sin(2 * angle * beam);
                             const cz = distanceFromCenter * Math.cos(2 * angle * beam);
                             const circle =  {
                                 cy,
@@ -48,15 +48,19 @@
                             };
 
                             output.push(circle);
-                            // if (beam % 4 === 0) {
-                            //     const extraCircle = Object.assign({}, circle);
-                            //     let beamAngle = 6 * angle * beam;
-                            //     let tiltAngle = 6 * skewAngle * Math.PI / numberOfBeams + (Math.PI / 2);
-                            //     extraCircle.cx = distanceFromCenter * Math.cos(tiltAngle) * Math.sin(beamAngle);
-                            //     extraCircle.cy = distanceFromCenter * Math.sin(tiltAngle) * Math.sin(beamAngle);
-                            //     extraCircle.cz = distanceFromCenter * Math.cos(beamAngle);
-                            //     output.push(extraCircle);
-                            // }
+                            if (beam > 0) {
+                                if (skewAngle === 0) {
+                                    const extraCircle = Object.assign({}, circle);
+                                    extraCircle.cz = -1 * circle.cy;
+                                    extraCircle.cy = circle.cz;
+                                    output.push(extraCircle);
+                                } else if (skewAngle === 3) {
+                                    const extraCircle = Object.assign({}, circle);
+                                    extraCircle.cy = -1 * circle.cz;
+                                    extraCircle.cz = circle.cy;
+                                    output.push(extraCircle);
+                                } 
+                            }
                         }
                     });
                     
@@ -71,7 +75,7 @@
 
 
             function init() {
-                const spheres = getSpheresForNumberOfBeams(18);  
+                const spheres = getSpheresForNumberOfBeams(12);  
                 scene = new THREE.Scene();
                 scene.background = new THREE.Color( 0x111111 );
                 // scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
