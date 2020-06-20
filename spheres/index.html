@@ -28,14 +28,21 @@
                 let sphereRadius = 100;
                 let radius = sphereRadius * sinOfAngle / (1 + sinOfAngle);
                 let distanceFromCenter = radius / sinOfAngle;
-                const angles = [0, 1, 2, 3, 4, 5];
+                const angles = [{
+                    tiltAngle: Math.PI/2,
+                    rotationAngle: 0,
+                },{
+                    tiltAngle: Math.PI/2-Math.PI/7,
+                    rotationAngle: 1/2,
+                }];
                 while (radius > 1) {
-                    angles.forEach(skewAngle => {
+                    angles.forEach(currentAngles => {
+                        const { tiltAngle, rotationAngle} = currentAngles;
                         area += numberOfBeams * (Math.PI * radius * radius);
-                        for (let beam = 0; beam <= numberOfBeams / 2; beam++) {
-                            const cx = distanceFromCenter * Math.cos(4 * skewAngle * Math.PI / numberOfBeams) * Math.sin(2 * angle * beam);
-                            const cy = distanceFromCenter * Math.sin(4 * skewAngle * Math.PI / numberOfBeams) * Math.sin(2 * angle * beam);
-                            const cz = distanceFromCenter * Math.cos(2 * angle * beam);
+                        for (let beam = 0; beam < numberOfBeams; beam++) {
+                            const cx = distanceFromCenter * Math.cos(2 * angle * (beam + rotationAngle)) * Math.sin(tiltAngle);
+                            const cy = distanceFromCenter * Math.sin(2 * angle * (beam + rotationAngle)) * Math.sin(tiltAngle);
+                            const cz = distanceFromCenter * Math.cos(tiltAngle);
                             const circle =  {
                                 cy,
                                 cx,
@@ -48,19 +55,25 @@
                             };
 
                             output.push(circle);
-                            if (beam > 0) {
-                                if (skewAngle === 0) {
-                                    const extraCircle = Object.assign({}, circle);
-                                    extraCircle.cz = -1 * circle.cy;
-                                    extraCircle.cy = circle.cz;
-                                    output.push(extraCircle);
-                                } else if (skewAngle === 3) {
-                                    const extraCircle = Object.assign({}, circle);
-                                    extraCircle.cy = -1 * circle.cz;
-                                    extraCircle.cz = circle.cy;
-                                    output.push(extraCircle);
-                                } 
-                            }
+                            // const extraCircle = Object.assign({}, circle);
+                            // rotationAngle = Math.PI / numberOfBeams;
+                            // tiltAngle = 3 * angle * beam;
+                            // extraCircle.cx = distanceFromCenter * Math.cos(rotationAngle) * Math.sin(tiltAngle);
+                            // extraCircle.cy = distanceFromCenter * Math.sin(rotationAngle) * Math.sin(tiltAngle);
+                            // extraCircle.cz = distanceFromCenter * Math.cos(tiltAngle);
+                            // output.push(extraCircle);
+                            // if (beam > 0) {
+                            //     if (skewAngle === 0) {
+                            //         const extraCircle = Object.assign({}, circle);
+                            //         extraCircle.cz = -1 * circle.cy;
+                            //         extraCircle.cy = circle.cz;
+                            //     } else if (skewAngle === 3) {
+                            //         const extraCircle = Object.assign({}, circle);
+                            //         extraCircle.cy = -1 * circle.cz;
+                            //         extraCircle.cz = circle.cy;
+                            //         output.push(extraCircle);
+                            //     } 
+                            // }
                         }
                     });
                     
@@ -88,8 +101,8 @@
 
                 // camera = new THREE.PerspectiveCamera( 100, window.innerWidth / window.innerHeight, 1, 500 );
                 camera = new THREE.OrthographicCamera( window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, -500, 500 );
-				camera.position.set(100, 100, 0);
-                // camera.lookAt(new THREE.Vector3(0,0,0)); // Set look at coordinate like this
+				camera.position.set(0, -100, 100);
+                camera.lookAt(new THREE.Vector3(0,0,0)); // Set look at coordinate like this
                 // controls
 
                 controls = new THREE.OrbitControls( camera, renderer.domElement );
