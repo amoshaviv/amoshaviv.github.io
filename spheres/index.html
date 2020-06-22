@@ -7,6 +7,7 @@
         <script src="https://threejs.org/build/three.min.js"></script>
         <script src="https://threejs.org/examples/js/controls/TrackballControls.js"></script>
         <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/7.0.1/math.min.js" integrity="sha256-vT3LwbZg753BzMyE25HfnWHVnMOcbuzde2XvX2wuD7U=" crossorigin="anonymous"></script>
 	</head>
 
 	<body style="padding: 0; margin: 0;">
@@ -18,6 +19,7 @@
 
             export function getSpheresForNumberOfBeams(numberOfBeams) {
                 let area = 0;
+                const identityMatrix = math.identity(3);
                 const output = [];
                 const angle = Math.PI / numberOfBeams;
                 const sinOfAngle = Math.sin(angle);
@@ -31,23 +33,22 @@
                 const angles = [{
                     tiltAngle: Math.PI/2,
                     rotationAngle: 0,
-                },{
-                    tiltAngle: Math.PI/2-Math.PI/7,
-                    rotationAngle: 1/2,
+                    radiusFactor: 1,
                 }];
-                while (radius > 1) {
+                while (step === 0) {
                     angles.forEach(currentAngles => {
-                        const { tiltAngle, rotationAngle} = currentAngles;
+                        const { tiltAngle, rotationAngle, radiusFactor} = currentAngles;
+
                         area += numberOfBeams * (Math.PI * radius * radius);
                         for (let beam = 0; beam < numberOfBeams; beam++) {
-                            const cx = distanceFromCenter * Math.cos(2 * angle * (beam + rotationAngle)) * Math.sin(tiltAngle);
-                            const cy = distanceFromCenter * Math.sin(2 * angle * (beam + rotationAngle)) * Math.sin(tiltAngle);
-                            const cz = distanceFromCenter * Math.cos(tiltAngle);
+                            const cx = distanceFromCenter * radiusFactor * Math.cos(2 * angle * (beam + rotationAngle)) * Math.sin(tiltAngle);
+                            const cy = distanceFromCenter * radiusFactor * Math.sin(2 * angle * (beam + rotationAngle)) * Math.sin(tiltAngle);
+                            const cz = distanceFromCenter * radiusFactor * Math.cos(tiltAngle);
                             const circle =  {
                                 cy,
                                 cx,
                                 cz,
-                                radius,
+                                radius: radius *  radiusFactor,
                                 angle,
                                 beam,
                                 numberOfBeams,
@@ -55,6 +56,41 @@
                             };
 
                             output.push(circle);
+
+                            // const x = Math.cos(2 * angle * beam);
+                            // const y = Math.sin(2 * angle * beam);
+                            if (beam % 2 === 0) {
+                                const zAngle = 2 * angle * beam;
+                                const sinZAngle = Math.sin(zAngle);
+                                const cosZAngle = Math.cos(zAngle);
+                                
+                                const xAngle = Math.PI/2;
+                                const sinXAngle = Math.sin(xAngle);
+                                const cosXAngle = Math.cos(xAngle);
+
+                                const rotationAroundX = math.matrix([[1,0,0], [0,cosXAngle,-sinXAngle], [0,sinXAngle,cosXAngle]]);
+                                const rotationAroundZ = math.matrix([[cosZAngle,-sinZAngle,0], [sinZAngle,cosZAngle,0], [0,0,1]]);
+                                // const w = math.matrix([[0,0,x], [0,0,-x], [-y,x,0]]);
+                                // const matrixAngle = Math.PI/2;
+                                // const firstTerm = math.multiply(Math.sin(matrixAngle), w);
+                                // const secondTerm = math.multiply(2 * Math.pow(Math.sin(matrixAngle/2), 2), math.multiply(w,w));
+                                // const rotationMatrix = math.add(identityMatrix, firstTerm, secondTerm);
+                                
+                                for (let newBeam = 0; newBeam <= numberOfBeams; newBeam++) {
+                                    const extraCircle = Object.assign({}, circle);
+                                    const cx = distanceFromCenter * radiusFactor * Math.cos(2 * angle * (newBeam + rotationAngle)) * Math.sin(tiltAngle);
+                                    const cy = distanceFromCenter * radiusFactor * Math.sin(2 * angle * (newBeam + rotationAngle)) * Math.sin(tiltAngle);
+                                    const cz = distanceFromCenter * radiusFactor * Math.cos(tiltAngle);
+                                    const m = math.matrix([[cx], [cy], [cz]]);
+                                    const newCircleCoordinates = math.multiply(rotationAroundZ, math.multiply(rotationAroundX, m));
+                                    extraCircle.cx = newCircleCoordinates.get([0, 0]);
+                                    extraCircle.cy = newCircleCoordinates.get([1, 0]);
+                                    extraCircle.cz = newCircleCoordinates.get([2, 0]);
+
+                                    output.push(extraCircle);
+                                }
+                            }
+
                             // const extraCircle = Object.assign({}, circle);
                             // rotationAngle = Math.PI / numberOfBeams;
                             // tiltAngle = 3 * angle * beam;
@@ -68,10 +104,15 @@
                             //         extraCircle.cz = -1 * circle.cy;
                             //         extraCircle.cy = circle.cz;
                             //     } else if (skewAngle === 3) {
-                            //         const extraCircle = Object.assign({}, circle);
-                            //         extraCircle.cy = -1 * circle.cz;
-                            //         extraCircle.cz = circle.cy;
-                            //         output.push(extraCircle);
+                                    // const extraCircle = Object.assign({}, circle);
+                                    // extraCircle.cy = -1/3 * circle.cz;
+                                    // extraCircle.cz = circle.cy;
+                                    // output.push(extraCircle);
+
+                                    // const extraCircle1 = Object.assign({}, circle);
+                                    // extraCircle1.cx = -1 * circle.cz;
+                                    // extraCircle1.cz = circle.cx;
+                                    // output.push(extraCircle1);
                             //     } 
                             // }
                         }
@@ -88,7 +129,7 @@
 
 
             function init() {
-                const spheres = getSpheresForNumberOfBeams(12);  
+                const spheres = getSpheresForNumberOfBeams(32);  
                 scene = new THREE.Scene();
                 scene.background = new THREE.Color( 0x111111 );
                 // scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
@@ -173,9 +214,7 @@
             }
 
             function render() {
-                console.log('HERE')
                 renderer.render( scene, camera );
-
             }
 		</script>
 	</body>
