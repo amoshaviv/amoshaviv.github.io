@@ -1,0 +1,31 @@
+i<!DOCTYPE html>
+<html lang="en">
+		<head>
+					<title>Editor</title>
+							<meta charset="utf-8">
+							        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+								        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.min.js" integrity="sha512-GoORoNnxst42zE3rYPj4bNBm0Q6ZRXKNH2D9nEmNvVF/z24ywVnijAWVi/09iBiVDQVf3UlZHpzhAJIdd9BXqw==" crossorigin="anonymous"></script>        
+									        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-javascript.min.js" integrity="sha512-ZxMbXDxB0Whct+zt+DeW/RZaBv33N5D7myNFtBGiqpDSFRLxn2CNp6An0A1zUAJU/+bl8CMVrwxwnFcpFi3yTQ==" crossorigin="anonymous"></script>
+										        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/theme-monokai.min.js" integrity="sha512-S4i/WUGRs22+8rjUVu4kBjfNuBNp8GVsgcK2lbaFdws4q6TF3Nd00LxqnHhuxS9iVDfNcUh0h6OxFUMP5DBD+g==" crossorigin="anonymous"></script>
+											        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/keybinding-vscode.min.js" integrity="sha512-q4RfQgSxej4hL+LTXQtI/3OSj4/ch/vbk4qpfRmFyreNGlMvnhpSqBBjgTVkgl08T3uQBhKL8f0qS86XVgthYw==" crossorigin="anonymous"></script>
+														<style type="text/css" media="screen">
+		    #editor { 
+			    		        position: absolute;
+								        top: 0;
+											        right: 0;
+														        bottom: 0; 
+																	        left: 0;
+																				    }
+		    		</style>
+					</head>
+
+						<body style="padding: 0; margin: 0;">
+									<div id="editor" editable></div>
+											<script>
+														    var editor = ace.edit("editor");
+														    		    editor.setTheme("ace/theme/monokai");
+														    		    editor.session.setMode("ace/mode/javascript");
+														    		    editor.setKeyboardHandler('ace/keyboard/vscode');
+														    		</script>
+																	</body>
+</html>
