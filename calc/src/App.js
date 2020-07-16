@@ -12,6 +12,7 @@ function App() {
   const initialConfig = Object.assign({}, defaultConfig, qsConfig);
   const [config, setConfig] = useState(initialConfig);
 
+
   const initialCircles = initialConfig.beams.reduce((arr, numberOfBeams)=>arr.concat(getCirclesForNumberOfBeams(numberOfBeams,initialConfig)), []);
   const [circles, setCircles] = useState(initialCircles);
   
