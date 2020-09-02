@@ -15,30 +15,35 @@
 		<script type="module">
             let  camera, controls, scene, renderer;
             const radius = 100;
-            
+            const angle = Math.PI/12;
+            const cosOfAngle = Math.cos(angle);
+            const sinOfAngle = Math.sin(angle);
+            const sinOf90 = Math.sin(Math.PI/4);
+            const q = new Quaternion([cosOfAngle, sinOfAngle * sinOf90, sinOfAngle * sinOf90, 0]);
+            const q1 = q.conjugate();
+
+
             init();           
             animate();
           
-            function getCircleByQuaternion(circle, q) {
-                const sinOfAngle = Math.sin(Math.PI/4);
-                const circleQuaternion  = new Quaternion(0, circle.cx, circle.cy, circle.cz);
-                const q = new Quaternion(sinOfAngle, 0, -sinOfAngle, 0);
-                const q1 = new Quaternion(1, 0, 0,  0);
-                const f = q.mul(circleQuaternioan.mul(q1));
+            function getCircleByQuaternion(circle) {
+                const circleQuaternion  = new Quaternion([0, circle.cx, circle.cy, circle.cz]);
+                const f = q.mul(circleQuaternion).mul(q1);
                 const { w, x, y, z } = f;
-                const newCircle = Object.assign({}, circle, {cx: x, cy: y, cz: x});
-                reutrn newCircle;
+                console.log(q, q1);
+                const newCircle = {radius: circle.radius, cx: x, cy: y, cz: z};
+                return newCircle;
             }
 
             function getSpheresForNumberOfBeams(){
                 const output = []
                 let circle =  {
-                    cx: 1 * radius,
-                    cz: 1 * radius,
+                    cx: 0,
+                    cz: 1,
                     cy: 0,
                     radius: 10,
                 };
-                for( let i = 0; i < 10; i++) {
+                for( let i = 0; i < 12; i++) {
                   output.push(circle);
                   circle = getCircleByQuaternion(circle);
                 }
@@ -90,9 +95,9 @@
                 spheres.forEach(sphereObj => {
                     let geometry = new THREE.SphereGeometry( sphereObj.radius, 32, 32 );
                     let sphere = new THREE.Mesh( geometry, material );
-                    sphere.position.x = sphereObj.cx;
-                    sphere.position.y = sphereObj.cy;
-                    sphere.position.z = sphereObj.cz;
+                    sphere.position.x = sphereObj.cx * radius; 
+                    sphere.position.y = sphereObj.cy * radius;
+                    sphere.position.z = sphereObj.cz * radius;
                     sphere.updateMatrix();
                     sphere.matrixAutoUpdate = false;
                     geometry.center();
