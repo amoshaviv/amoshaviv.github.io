@@ -16,7 +16,7 @@
             let  camera, controls, scene, renderer;
             const sphereRadius = 100;
             const numberOfBeams = 17;
-            const numberOfLayers = 20;
+            const numberOfLayers = 17;
             const angle = Math.PI/numberOfBeams;
             const cosOfAngle = Math.cos(angle);
             const cosDoubleOfAngle = Math.cos(2 *angle);
@@ -40,7 +40,7 @@
 
             function getCirclesRadii() {
                 const initialRadius = factor;
-                const initialAngle = Math.asin(initialRadius/(sinOfAngle * (1 - initialRadius)));
+                const initialAngle = Math.PI / 2;
                 const radii = [initialRadius];
                 const angles = [initialAngle];
                 for (let i = 1; i < numberOfLayers; i++) {
@@ -77,12 +77,23 @@
                     cz: 0,
                 }
             }
+
+            function printCirclesData(circlesRadii) {
+                // console.log('Circles Angles')
+                circlesRadii.angles.forEach(angle => console.log(angle.toFixed(20)))
+                // console.log('Circles Radii')
+                circlesRadii.radii.forEach(angle => console.log(angle.toFixed(20)))
+            }
             
             function getSpheresForNumberOfBeams(){
                 const output = []
                 const circlesRadii = getCirclesRadii();
-                console.log(circlesRadii);
+                console.time('Calculate circles radii');
+                printCirclesData(circlesRadii);
+                //do critical time stuff
+                console.timeEnd('Calculate circles radii');
                 
+                console.time('Get circles by quaternion');
                 for( let j = 0; j < numberOfLayers; j++) {
                     let circle = getCircle(circlesRadii.radii[j]);
 
@@ -96,6 +107,7 @@
                         circle = getCircleByQuaternion(circle);
                     }
                 }
+                console.timeEnd('Get circles by quaternion');
 
                 return output;
             }
@@ -106,21 +118,23 @@
                     numberOfLayers,
                     totalSurfaceArea: 4 * sphereRadius * sphereRadius * Math.PI,
                     totalVolume: 4/3 * sphereRadius * sphereRadius * sphereRadius * Math.PI,
-                    area: 0,
-                    volume: 0,
+                    sumOfArea: 0,
+                    sumOfVolume: 0,
                 };
                 spheres.forEach(sphere => {
-                    output.area += sphere.radius * sphere.radius * Math.PI;
-                    output.volume += 4/3 * sphere.radius * sphere.radius * sphere.radius * Math.PI;
+                    output.sumOfArea += sphere.radius * sphere.radius * Math.PI;
+                    output.sumOfVolume += 4/3 * sphere.radius * sphere.radius * sphere.radius * Math.PI;
                 });
+                output.areaRatio = output.totalSurfaceArea / output.sumOfArea;
+                output.volumeRatio = output.totalVolume / output.sumOfVolume;
+                console.log(output);
                 return output;
             }
 
 
             function init() {
                 const spheres = getSpheresForNumberOfBeams();  
-                const spheresStats = getSpheresStats(spheres);
-                debugger
+                // const spheresStats = getSpheresStats(spheres);
                 scene = new THREE.Scene();
                 scene.background = new THREE.Color( 0x111111 );
                 // scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
@@ -170,10 +184,13 @@
                 let material = new THREE.MeshPhongMaterial( { color: 0xffffff, transparent: false, opacity: 1 } );
                 let basicMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, transparent: true, opacity: 0.1 } );
                 
+                console.log('Total Number Of Spheres: ', spheres.length);
+                console.time('Creating spheres');  
                 createSphere({ radius: sphereRadius, cx: 0, cy: 0, cz: 0}, basicMaterial)    
                 spheres.forEach(sphereObj => {
                     createSphere(sphereObj, material)    
                 })
+                console.timeEnd('Creating spheres');  
 
                 // lights
 
