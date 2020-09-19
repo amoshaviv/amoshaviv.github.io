@@ -15,7 +15,7 @@
 		<script type="module">
             let  camera, controls, scene, renderer;
             const sphereRadius = 100;
-            const numberOfBeams = 13;
+            const numberOfBeams = 17;
             const numberOfLayers = 20;
             const angle = Math.PI/numberOfBeams;
             const cosOfAngle = Math.cos(angle);
@@ -88,18 +88,39 @@
 
                     for( let i = 0; i < numberOfBeams; i++) {
                         output.push(circle);
+                        if(circle.cy !== 0) {
+                            const inverseCircle = Object.assign({}, circle);
+                            inverseCircle.cy = -1 * inverseCircle.cy;
+                            output.push(inverseCircle)
+                        }
                         circle = getCircleByQuaternion(circle);
                     }
                 }
 
-                console.log(output);
+                return output;
+            }
+
+            function getSpheresStats(spheres) {
+                const output = {
+                    numberOfBeams,
+                    numberOfLayers,
+                    totalSurfaceArea: 4 * sphereRadius * sphereRadius * Math.PI,
+                    totalVolume: 4/3 * sphereRadius * sphereRadius * sphereRadius * Math.PI,
+                    area: 0,
+                    volume: 0,
+                };
+                spheres.forEach(sphere => {
+                    output.area += sphere.radius * sphere.radius * Math.PI;
+                    output.volume += 4/3 * sphere.radius * sphere.radius * sphere.radius * Math.PI;
+                });
                 return output;
             }
 
 
-
             function init() {
                 const spheres = getSpheresForNumberOfBeams();  
+                const spheresStats = getSpheresStats(spheres);
+                debugger
                 scene = new THREE.Scene();
                 scene.background = new THREE.Color( 0x111111 );
                 // scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );

@@ -4,6 +4,7 @@
 		<title>Sphere</title>
 		<meta charset="utf-8">
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <script src="quaternion.min.js"></script>
         <script src="https://threejs.org/build/three.min.js"></script>
         <script src="https://threejs.org/examples/js/controls/TrackballControls.js"></script>
         <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
@@ -13,91 +14,131 @@
 	<body style="padding: 0; margin: 0;">
 		<script type="module">
             let  camera, controls, scene, renderer;
-            
-            init();           
+            const sphereRadius = 100;
+            const numberOfBeams = 17;
+            const numberOfLayers = 20;
+            const angle = Math.PI/numberOfBeams;
+            const cosOfAngle = Math.cos(angle);
+            const cosDoubleOfAngle = Math.cos(2 *angle);
+            const sinOfAngle = Math.sin(angle);
+            const sinOf30 = Math.sin(Math.PI/6);
+            const sinOfHalfAngle = Math.sin(angle/2);
+            const factor = sinOfAngle / (1 + sinOfAngle);
+
+            const radius = sphereRadius * factor;
+            const startingCircle = {
+                cx: sphereRadius-radius,
+                cz: 0,
+                cy: 0,
+                radius,
+            };
+            const q = Quaternion.fromEuler(0, 0, angle*2, 'ZXY');
+            const q1 = q.conjugate();
+
+            init();
             animate();
 
-            export function getSpheresForNumberOfBeams(numberOfBeams) {
-                let area = 0;
-                const identityMatrix = math.identity(3);
-                const output = [];
-                const angle = Math.PI / numberOfBeams;
-                const sinOfAngle = Math.sin(angle);
-                const cosOfAngle = Math.cos(angle);
-                const factor = (1 - sinOfAngle) / (1 + sinOfAngle);
-                const factor1 = (sinOfAngle) / (1 + sinOfAngle);
-
-                let step = 0;
-                let sphereRadius = 100;
-                let radius = sphereRadius * sinOfAngle / (1 + sinOfAngle);
-                let distanceFromCenter = radius / sinOfAngle;
-                console.log(sphereRadius, radius, distanceFromCenter)
-                const angles = [{
-                    tiltAngle: Math.PI/2,
-                    rotationAngle: 0,
-                    radiusFactor: 1,
-                }];
-                while (step < 2) {
-                    angles.forEach(currentAngles => {
-                        const { tiltAngle, rotationAngle, radiusFactor} = currentAngles;
-
-                        area += numberOfBeams * (Math.PI * radius * radius);
-                        for (let beam = 0; beam < numberOfBeams; beam++) {
-                            const alpha = 2 * angle * beam; 
-                            const beta = Math.asin(radius/((sphereRadius-radius)));
-                            const cx = distanceFromCenter * Math.cos(alpha) * Math.sin(beta);
-                            const cy = distanceFromCenter * Math.sin(alpha) * Math.sin(beta);
-                            const cz = distanceFromCenter * Math.cos(beta);
-                            console.log('here', radius);
-
-                            const circle =  {
-                                cy,
-                                cx,
-                                cz,
-                                radius,
-                                angle,
-                                beam,
-                                numberOfBeams,
-                                distanceFromCenter,
-                            };
-
-                            output.push(circle);
-                        }
-                    });
-                    
-                    // radius = radius * factor;
-                    radius = (-2*(Math.sin(angle)))/(Math.cos(2*angle)-3) * sphereRadius;
-                    distanceFromCenter = sphereRadius - radius;
-                    step++;
+            function getCirclesRadii() {
+                const initialRadius = factor;
+                const initialAngle = Math.asin(initialRadius/(sinOfAngle * (1 - initialRadius)));
+                const radii = [initialRadius];
+                const angles = [initialAngle];
+                for (let i = 1; i < numberOfLayers; i++) {
+                    const lastRadius = radii[i-1];
+                    const lastAngle = angles[i-1];
+                    const sinOfLastAngle = Math.sin(lastAngle);
+                    const tanOfHalfLastAngle = Math.tan(lastAngle/2);
+                    const newAngle =  2 * Math.atan((2*(sinOfAngle)**2 + 1)*tanOfHalfLastAngle + Math.sqrt(2) * Math.sqrt((sinOfAngle)**2 * (-(cosDoubleOfAngle - 3))*(tanOfHalfLastAngle)**2));
+                    const newRadius = ((Math.sin(newAngle))/(Math.sin(newAngle)+(1/sinOfAngle)));
+                    radii.push(newRadius);
+                    angles.push(newAngle);
                 }
 
-                console.log(area);
+                return { radii, angles };
+            }
+          
+            function getCircleByQuaternion(circle) {
+                const circleQuaternion  = new Quaternion([0, circle.cx, circle.cy, circle.cz]);
+                const f = q.mul(circleQuaternion).mul(q1);
+                const { w, x, y, z } = f;
+                const newCircle = {radius: circle.radius, cx: x, cy: y, cz: z};
+                return newCircle;
+            }
+
+            function getCircle(radius) {
+                const r = radius * sphereRadius
+                const R = r / sinOfAngle;
+                const diff = parseFloat(parseFloat(r + R - sphereRadius).toFixed(10));
+
+                return {
+                    radius: r,
+                    cx: R,
+                    cy: diff === 0 ? 0 : Math.sqrt(Math.pow(sphereRadius - r,2)-Math.pow(R,2)),
+                    cz: 0,
+                }
+            }
+            
+            function getSpheresForNumberOfBeams(){
+                const output = []
+                const circlesRadii = getCirclesRadii();
+                console.log(circlesRadii);
+                
+                for( let j = 0; j < numberOfLayers; j++) {
+                    let circle = getCircle(circlesRadii.radii[j]);
+
+                    for( let i = 0; i < numberOfBeams; i++) {
+                        output.push(circle);
+                        if(circle.cy !== 0) {
+                            const inverseCircle = Object.assign({}, circle);
+                            inverseCircle.cy = -1 * inverseCircle.cy;
+                            output.push(inverseCircle)
+                        }
+                        circle = getCircleByQuaternion(circle);
+                    }
+                }
+
+                return output;
+            }
+
+            function getSpheresStats(spheres) {
+                const output = {
+                    numberOfBeams,
+                    numberOfLayers,
+                    totalSurfaceArea: 4 * sphereRadius * sphereRadius * Math.PI,
+                    totalVolume: 4/3 * sphereRadius * sphereRadius * sphereRadius * Math.PI,
+                    area: 0,
+                    volume: 0,
+                };
+                spheres.forEach(sphere => {
+                    output.area += sphere.radius * sphere.radius * Math.PI;
+                    output.volume += 4/3 * sphere.radius * sphere.radius * sphere.radius * Math.PI;
+                });
                 return output;
             }
 
 
             function init() {
-                const spheres = getSpheresForNumberOfBeams(6);  
+                const spheres = getSpheresForNumberOfBeams();  
+                const spheresStats = getSpheresStats(spheres);
+                debugger
                 scene = new THREE.Scene();
                 scene.background = new THREE.Color( 0x111111 );
                 // scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
-				scene.add( new THREE.AxesHelper( 100 ) );
+				scene.add( new THREE.AxesHelper( sphereRadius ) );
 
                 renderer = new THREE.WebGLRenderer( { antialias: false } );
                 renderer.setPixelRatio( window.devicePixelRatio );
                 renderer.setSize( window.innerWidth, window.innerHeight );
                 document.body.appendChild( renderer.domElement );
 
-                // camera = new THREE.PerspectiveCamera( 100, window.innerWidth / window.innerHeight, 1, 500 );
                 const zoom = 6;
-                camera = new THREE.OrthographicCamera( window.innerWidth / -zoom, window.innerWidth / zoom, window.innerHeight / zoom, window.innerHeight / -zoom, -100, 100 );
-				camera.position.set(0, -1, 1);
+                camera = new THREE.OrthographicCamera( window.innerWidth / -zoom, window.innerWidth / zoom, window.innerHeight / zoom, window.innerHeight / -zoom, -500, 500 );
+				camera.position.set(1, 1, 1);
                 camera.lookAt(new THREE.Vector3(0,0,0)); // Set look at coordinate like this
                 // controls
 
                 controls = new THREE.OrbitControls( camera, renderer.domElement );
                 controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
-                
 
                 // controls.minDistance = 5;
                 // controls.maxDistance = 500;
@@ -107,27 +148,31 @@
                 // controls.addEventListener( 'change', render );
 
 				// controls.rotateSpeed = 1.0;
-				// controls.zoomSpeed = 1.2;    
+				// controls.zoomSpeed = 1.2;
                 // controls.panSpeed = 0.8;
                 // controls.keys = [ 65, 83, 68 ];
 
 
                 // world
 
-                let material = new THREE.MeshPhongMaterial( { color: 0xffffff, transparent: true, opacity: 0.5 } );
-                let basicMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, transparent: true, opacity: 0.9 } );
-
-                spheres.forEach(sphereObj => {
+                const createSphere = (sphereObj, material) => {
                     let geometry = new THREE.SphereGeometry( sphereObj.radius, 32, 32 );
                     let sphere = new THREE.Mesh( geometry, material );
-                    sphere.position.x = sphereObj.cx;
+                    sphere.position.x = sphereObj.cx; 
                     sphere.position.y = sphereObj.cy;
                     sphere.position.z = sphereObj.cz;
                     sphere.updateMatrix();
                     sphere.matrixAutoUpdate = false;
                     geometry.center();
-                    sphere.addEventListener( 'click', (ev) => sphere.visible = false );
                     scene.add( sphere );
+                };
+
+                let material = new THREE.MeshPhongMaterial( { color: 0xffffff, transparent: false, opacity: 1 } );
+                let basicMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, transparent: true, opacity: 0.1 } );
+                
+                createSphere({ radius: sphereRadius, cx: 0, cy: 0, cz: 0}, basicMaterial)    
+                spheres.forEach(sphereObj => {
+                    createSphere(sphereObj, material)    
                 })
 
                 // lights
