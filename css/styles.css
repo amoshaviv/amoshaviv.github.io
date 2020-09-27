@@ -29,6 +29,9 @@
 .project-link::after {
 	content: "View Project"
 }
+.render-link::after {
+	content: "View Render"
+}
 .book-link::after {
 	content: "View Book"
 }
