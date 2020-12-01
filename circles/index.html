@@ -4,23 +4,23 @@
 		<meta charset="utf-8">
 
 		<!-- Primary Meta Tags -->
-		<title>Circles in beams</title>
-		<meta name="title" content="Circles in beams">
-		<meta name="description" content="I draw vector graphics circles inscribed in a beam.">
+		<title>Circles in sectors</title>
+		<meta name="title" content="Circles in sectors">
+		<meta name="description" content="I draw vector graphics circles inscribed in a sector.">
 		<meta name="author" content="Amos Haviv">
 
 		<!-- Open Graph / Facebook -->
 		<meta property="og:type" content="website">
 		<meta property="og:url" content="https://amoshaviv.com/circles/">
-		<meta property="og:title" content="Circles in beams">
-		<meta property="og:description" content="I draw vector graphics circles inscribed in a beam.">
+		<meta property="og:title" content="Circles in sectors">
+		<meta property="og:description" content="I draw vector graphics circles inscribed in a sector.">
 		<meta property="og:image" content="https://amoshaviv.com/circles/img/orbits.png">
 
 		<!-- Twitter -->
-		<meta property="twitter:card" content="Circles in beams">
+		<meta property="twitter:card" content="Circles in sectors">
 		<meta property="twitter:url" content="https://amoshaviv.com/circles/">
-		<meta property="twitter:title" content="Circles in beams">
-		<meta property="twitter:description" content="I draw vector graphics circles inscribed in a beam.">
+		<meta property="twitter:title" content="Circles in sectors">
+		<meta property="twitter:description" content="I draw vector graphics circles inscribed in a sector.">
 		<meta property="twitter:image" content="https://amoshaviv.com/circles/img/orbits.png">	
 
 		<!-- View --> 
@@ -33,42 +33,42 @@
 	</head>
 		<body data-theme="dark">
 			<main class="container">
-					<h1>Circles in beams</h1>
+					<h1>Circles in sectors</h1>
 					<h2>Introduction</h2>
 					<p>
-					I draw vector graphics circles inscribed in a beam. 
+					I draw vector graphics circles inscribed in a sector. 
 					<br />
 					Implementing those in self executing SVGs is surprisingly straight forward.
 					</p>
-					<h3><a href="svg/beam.svg">Beam</a></h3>
+					<h3><a href="svg/sector.svg">Sector</a></h3>
 					<p>
-					A beam is a set of circles inscribed between two lines.
+					A sector is a set of circles inscribed between two lines.
 					If \(R\) is the radius of the confining circle and \(\theta\) is half the angle between the two lines, the radii of of the first ring of circles is determined by: 
 					$$r_{0} = R({\sin{\theta} \over 1+\sin{\theta}})$$
 					And the radii of inner rings circles can be calculated by:
 					$$r_{n+1} = r_{n}({1+\sin{\theta} \over 1-\sin{\theta}})$$
 					</p>
 					<p>
-					For instance when \(\theta = {\pi \over 16}\), our beam will look as follows:
+					For instance when \(\theta = {\pi \over 16}\), our sector will look as follows:
 					</p>
-					<a href="svg/beam.svg" class="text-center svg-link"><img alt="Beam" class="img-fluid" src="img/beam.png"/></a>
-					<h3><a href="svg/beams.svg">Beams</a></h3>
+					<a href="svg/sector.svg" class="text-center svg-link"><img alt="Sector" class="img-fluid" src="img/sector.png"/></a>
+					<h3><a href="svg/sectors.svg">Sectors</a></h3>
 					<p>
-					We can draw multiple beams.
+					We can draw multiple sectors.
 					</p>
-					<a href="svg/beams.svg" class="text-center svg-link"><img alt="Beams" class="img-fluid" src="img/beams.png" /></a>
+					<a href="svg/sectors.svg" class="text-center svg-link"><img alt="Sectors" class="img-fluid" src="img/sectors.png" /></a>
 					<h3><a href="svg/grid.svg">Grid</a></h3>
 					<p>
 					If the angle is a fraction of pi, we can create a grid. 
 					<br />
-					If we choose to have \(N\) beams, our angle would be \(\theta = {\pi \over N}\).
+					If we choose to have \(N\) sectors, our angle would be \(\theta = {\pi \over N}\).
 					<br />
 					In the case below, \(N=8\) and \(\theta = {\pi \over 8}\).
 					</p>
 					<a href="svg/grid.svg" class="text-center svg-link"><img alt="Grid" class="img-fluid" src="img/grid.png" /></a>
 					<h3><a href="svg/resolution.svg">Resolution</a></h3>
 					<p>
-					If we decrease the angle of drawing we will have smaller circles and finer beams, doing so increases the resolution of our grid.
+					If we decrease the angle of drawing we will have smaller circles and finer sectors, doing so increases the resolution of our grid.
 					</p>
 					<a href="svg/resolution.svg" class="text-center svg-link"><img  alt="Resolution" class="img-fluid" src="img/resolution.png" /></a>
 					<h3><a href="svg/alpha.svg">Alpha</a></h3>
@@ -93,7 +93,7 @@
 					<a href="svg/flower.svg" class="text-center svg-link animation-link"><img  alt="Flower" class="img-fluid" src="img/flower.png" /></a>
 					<h3><a href="svg/spirals.svg">Spirals</a></h3>
 					<p>
-					Choosing which beams to draw allows you to create other patterns:
+					Choosing which sectors to draw allows you to create other patterns:
 					</p>
 					<a href="svg/spirals.svg" class="text-center svg-link animation-link"><img  alt="Spirals" class="img-fluid" src="img/spirals.png" /></a>
 					<h3><a href="svg/orbits.svg">Orbits</a></h3>
@@ -134,9 +134,9 @@
 					<h3>Interesting discovery:</h3>
 					<p>
 					While I was coding this, I started noticing the total area of the inner circles is converging. 
-					This makes sense, since the area of the circles is limited by the number of beams and is getting smaller at each ring.
+					This makes sense, since the area of the circles is limited by the number of sectors and is getting smaller at each ring.
 					<br>
-					<h5>What is the total area of all the circles in a single beam?</h5>
+					<h5>What is the total area of all the circles in a single sector?</h5>
 					Like in high school we will start with the unit circle as the outer perimeter, with \(r_0\) being the radius of the first ring of circles, \(r_1\) being the radius of the second ring of circles, and so on.
 					Since the unit circle has a radius of 1, we can immediately deduce the following:
 					$$r_{0} = ({\sin{\theta} \over 1+\sin{\theta}})$$
@@ -148,16 +148,16 @@
 					$$r_{2} = {(\sin{\theta})({1-\sin{\theta})^2} \over (1+\sin{\theta})^3}$$
 					so generally we can say that:
 					$$r_{n} = {(\sin{\theta})({1-\sin{\theta})^n} \over (1+\sin{\theta})^{n+1}}$$
-					so if the area of a single circle in a beam is:
+					so if the area of a single circle in a sector is:
 					$$A_{n} = \pi r_{n}^2 = \pi ({(\sin{\theta})({1-\sin{\theta})^n} \over (1+\sin{\theta})^{n+1}})^2$$
-					the area of a single beam of circles will be:
+					the area of a single sector of circles will be:
 					$$A_{b} = \pi \sum_{n=0}^{\infty} ({(\sin{\theta})({1-\sin{\theta})^n} \over (1+\sin{\theta})^{n+1}})^2 $$
-					and since we're dealing with two or more beams, we know that:
+					and since we're dealing with two or more sectors, we know that:
 					$$ 0 < \theta < {\pi \over 2} $$
-					it means the sum of areas of all the circles inscribed in a beam converges to:
+					it means the sum of areas of all the circles inscribed in a sector converges to:
 					$$A_{b} = \pi \sum_{n=0}^{\infty} ({(\sin{\theta})({1-\sin{\theta})^n} \over (1+\sin{\theta})^{n+1}})^2 = {\pi \sin{\theta} \over 4}$$
-					<h5>What is the total area of all the circles in all the beams?</h5>
-					Assuming we have \(k\) beams, then \(\theta = {\pi \over k}\) and our sum would be:
+					<h5>What is the total area of all the circles in all the sectors?</h5>
+					Assuming we have \(k\) sectors, then \(\theta = {\pi \over k}\) and our sum would be:
 					$$A_{k} = {k A_{b}} = {\pi k \sin{\pi \over k} \over 4}$$
 					and if we take the limit of \(k\), we will get:
 					$$\lim_{k \to \infty} {\pi k \sin{\pi \over k} \over 4} = {\pi^2 \over 4} \tag*{$\blacksquare$}$$

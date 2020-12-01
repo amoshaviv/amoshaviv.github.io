@@ -8,7 +8,7 @@
 	const maximumGraphRadius = Math.min(windowCenterX, windowCenterY);
 	const maximumGridRadius = Math.max(windowCenterX, windowCenterY);
 	const minimalRadius = 1; 
-	const angleRatios = [1/8];
+	const angleRatios = [1/72];
 	const darkMode = true;
 	const svg = document.getElementsByTagName('svg')[0];
 	if (darkMode) svg.setAttribute('style', 'background: black');
@@ -41,6 +41,13 @@ angleRatios.forEach(angleRatio => {
 		let radius = minimalRadius;
 		let center = radius * centerFactor - centerFactor;
 		let distanceFromCenter = Math.sqrt(2) * center;
+
+		const circle = document.createElementNS(svgns, 'circle');
+		circle.setAttributeNS(null, 'r', maximumGraphRadius - 3);
+		circle.setAttributeNS(null, 'style', `fill: rgba(${0},${0},${255}, ${0.6});`);
+		circle.setAttributeNS(null, 'cx', windowCenterX);
+		circle.setAttributeNS(null, 'cy', windowCenterY);
+		svg.appendChild(circle);
 
 		while (distanceFromCenter + radius < maximumGraphRadius) {
 			for (let ray = 0; ray < numberOfRays; ray++) {
