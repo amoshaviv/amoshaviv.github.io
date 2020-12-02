@@ -53,6 +53,13 @@ angleRatios.forEach(angleRatio => {
 			center = radius * centerFactor - centerFactor;
 			distanceFromCenter = Math.sqrt(2) * center;
 		}
+
+		const circle = document.createElementNS(svgns, 'circle');
+		circle.setAttributeNS(null, 'r', distanceFromCenter - radius);
+		circle.setAttributeNS(null, 'style', `fill: rgba(${0},${0},${255}, ${0.6});`);
+		circle.setAttributeNS(null, 'cx', windowCenterX);
+		circle.setAttributeNS(null, 'cy', windowCenterY);
+		svg.prepend(circle);
 });
 
 
