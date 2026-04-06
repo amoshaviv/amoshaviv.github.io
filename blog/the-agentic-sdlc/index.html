@@ -704,7 +704,7 @@ On Friday morning, the team fully releases the feature. For the next few weeks t
 
   <p>Every agent that writes code, runs tests, or deploys changes needs a secure execution environment. The security model should follow the principle of least privilege: agents start with read-only access and earn write permissions through demonstrated reliability and appropriate human oversight.</p>
 
-  <p>A planning agent that reads tickets and writes documents is low risk. A build agent that pushes to Git is medium risk. A release agent that deploys to production is high risk. Each level demands different isolation, different approval flows, and different monitoring. This is a deep topic that deserves its own treatment, but the key principle is: treat agent permissions like you treat employee permissions. Scope them tightly and audit them continuously.</p>
+  <p>A planning agent that reads tickets and writes documents is low risk. A build agent that pushes to Git is medium risk. A release agent that deploys to production is high risk. Each level demands different isolation, different approval flows, and different monitoring. This is a deep topic that deserves its own treatment(checkout my colleague's Emir <a href="https://emirb.github.io/blog/microvm-2026/">writeup</a> on the topic), but the key principle is: treat agent permissions like you treat employee permissions. Scope them tightly and audit them continuously.</p>
 
   <hr>
 
