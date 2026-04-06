@@ -638,7 +638,7 @@ On Friday morning, the team fully releases the feature. For the next few weeks t
 
   <h2>Orchestration: keep it boring</h2>
 
-  <p>There is a strong temptation to over-engineer orchestration. Multi-agent frameworks, complex message buses, dynamic agent routing. The evidence is clear: the teams that succeed start simple.</p>
+  <p>There is a strong temptation to over-engineer orchestration. Multi-agent frameworks, complex message buses, dynamic agent routing. Like with everything in software development: the teams that succeed start simple.</p>
 
   <p>The simplest orchestration pattern that works for the SDLC is a sequential pipeline with human checkpoints, backed by your existing ticket system as the state machine. The ticket's status field <em>is</em> the orchestration. When a ticket moves to "Ready for Design," the design agent activates. When an MR is opened, the validation agents run. When validation passes and a human approves, the release pipeline fires.</p>
 
