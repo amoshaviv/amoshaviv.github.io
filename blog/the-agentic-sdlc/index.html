@@ -409,16 +409,16 @@ On Friday morning, the team fully releases the feature. For the next few weeks t
           <span class="pp-chev">&#9656;</span>
         </div>
         <div class="pp-expand"><div class="pp-body">
-          <div class="pp-desc">Build is where most organizations start with agents, and it is the most mature phase. The agent receives all prior context and produces code changes. For multi-service changes, sub-agents can work in parallel. The output is one or more merge requests, not merged code.</div>
+          <div class="pp-desc">Build is where most organizations start with agents, and it is the most mature phase. The agent receives all prior context and produces code changes. For multi-service changes, sub-agents can work in parallel. The output is one or more pull requests, not merged code.</div>
           <div class="dg">
             <div class="db"><div class="l">Trigger Event</div><div class="v">Ticket moves to "Ready for Implementation" (design approved)</div></div>
             <div class="db"><div class="l">Context Inputs</div><div class="v"><span class="tag">ticket</span><span class="tag">PRD</span><span class="tag">design artifacts</span><span class="tag">codebase</span><span class="tag">test suite</span></div></div>
             <div class="db"><div class="l">Tools</div><div class="v"><span class="tag">SCM (Git)</span><span class="tag">IDE / code agent</span><span class="tag">CI pipeline</span><span class="tag">package registry</span></div></div>
             <div class="db"><div class="l">MCPs</div><div class="v"><span class="tag">GitHub MCP</span><span class="tag">GitLab MCP</span><span class="tag">Jira MCP</span><span class="tag">Slack MCP</span><span class="tag">Sentry MCP</span><span class="tag">PostgreSQL MCP</span></div></div>
-            <div class="db"><div class="l">Output</div><div class="v"><span class="tag">merge request(s)</span><span class="tag">code changes</span><span class="tag">unit tests</span><span class="tag">changelog</span></div></div>
+            <div class="db"><div class="l">Output</div><div class="v"><span class="tag">pull request(s)</span><span class="tag">code changes</span><span class="tag">unit tests</span><span class="tag">changelog</span></div></div>
             <div class="db"><div class="l">Owner</div><div class="v">Engineer, EM, or SRE depending on scope</div></div>
             <div class="db"><div class="l">Sub-agents</div><div class="v">Code writer (per service), test generator, PR description writer, lint and format agent</div></div>
-            <div class="hc"><span class="hc-label">review</span><span><strong>Human involvement:</strong> Code review remains human-owned. AI can assist with review, but a human must approve the merge request. Agents produce MRs; humans merge them.</span></div>
+            <div class="hc"><span class="hc-label">review</span><span><strong>Human involvement:</strong> Code review remains human-owned. AI can assist with review, but a human must approve the pull request. Agents produce MRs; humans merge them.</span></div>
             <div class="fb"><span class="fb-label">feedback</span><span><strong>Sends to:</strong> Design (if the design is infeasible). <strong>Receives from:</strong> Validate (test failures, security issues return here with failure context).</span></div>
           </div>
         </div></div>
@@ -432,14 +432,14 @@ On Friday morning, the team fully releases the feature. For the next few weeks t
         <div class="pp-head">
           <span class="pp-num">04</span>
           <span class="pp-name">Validate</span>
-          <span class="pp-evt">MR ready</span>
+          <span class="pp-evt">PR ready</span>
           <span class="pp-chev">&#9656;</span>
         </div>
         <div class="pp-expand"><div class="pp-body">
           <div class="pp-desc">Validation ensures the change is safe for release. This is where agents shine in parallel: unit tests, integration tests, security scans, compliance checks, and change management validation all run concurrently. If validation fails, the feedback loop sends work back to Build with specific failure context.</div>
           <div class="dg">
-            <div class="db"><div class="l">Trigger Event</div><div class="v">Merge request ready to be merged</div></div>
-            <div class="db"><div class="l">Context Inputs</div><div class="v"><span class="tag">ticket</span><span class="tag">PRD</span><span class="tag">design</span><span class="tag">code diff</span><span class="tag">MR metadata</span><span class="tag">test history</span></div></div>
+            <div class="db"><div class="l">Trigger Event</div><div class="v">Pull request ready to be merged</div></div>
+            <div class="db"><div class="l">Context Inputs</div><div class="v"><span class="tag">ticket</span><span class="tag">PRD</span><span class="tag">design</span><span class="tag">code diff</span><span class="tag">PR metadata</span><span class="tag">test history</span></div></div>
             <div class="db"><div class="l">Tools</div><div class="v"><span class="tag">CI/CD</span><span class="tag">test runners</span><span class="tag">SAST / DAST</span><span class="tag">staging env</span></div></div>
             <div class="db"><div class="l">MCPs</div><div class="v"><span class="tag">GitHub MCP</span><span class="tag">GitLab MCP</span><span class="tag">Snyk MCP</span><span class="tag">SonarQube MCP</span><span class="tag">Jira MCP</span><span class="tag">Slack MCP</span></div></div>
             <div class="db"><div class="l">Output</div><div class="v"><span class="tag">test results</span><span class="tag">security report</span><span class="tag">compliance sign-off</span><span class="tag">release candidate</span></div></div>
@@ -640,7 +640,7 @@ On Friday morning, the team fully releases the feature. For the next few weeks t
 
   <p>There is a strong temptation to over-engineer orchestration. Multi-agent frameworks, complex message buses, dynamic agent routing. Like with everything in software development: the teams that succeed start simple.</p>
 
-  <p>The simplest orchestration pattern that works for the SDLC is a sequential pipeline with human checkpoints, backed by your existing ticket system as the state machine. The ticket's status field <em>is</em> the orchestration. When a ticket moves to "Ready for Design," the design agent activates. When an MR is opened, the validation agents run. When validation passes and a human approves, the release pipeline fires.</p>
+  <p>The simplest orchestration pattern that works for the SDLC is a sequential pipeline with human checkpoints, backed by your existing ticket system as the state machine. The ticket's status field <em>is</em> the orchestration. When a ticket moves to "Ready for Design," the design agent activates. When an PR is opened, the validation agents run. When validation passes and a human approves, the release pipeline fires.</p>
 
   <div class="callout insight">
     <div class="ct">The opinionated default</div>
@@ -751,7 +751,7 @@ function toggle(p) {
 const PH = [
   { id:'plan', label:'Plan', color:'#e8a44a', a:['ticket','PRD / plan','questions log'] },
   { id:'design', label:'Design', color:'#c77dff', a:['system design','DB schema','API contracts'] },
-  { id:'build', label:'Build', color:'#4ecdc4', a:['code changes','merge request','unit tests'] },
+  { id:'build', label:'Build', color:'#4ecdc4', a:['code changes','pull request','unit tests'] },
   { id:'validate', label:'Validate', color:'#45b7d1', a:['test results','security report','compliance'] },
   { id:'release', label:'Release', color:'#f7768e', a:['deploy receipt','canary metrics','release notes'] },
   { id:'monitor', label:'Monitor', color:'#9ece6a', a:['health status','incident report?','new ticket?'] }
