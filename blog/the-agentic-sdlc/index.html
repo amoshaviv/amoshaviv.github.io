@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Agentic SDLC</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0c0e;
+  --bg-elevated: #141418;
+  --bg-card: #1a1a20;
+  --border: #2a2a34;
+  --border-active: #4a4a5a;
+  --text: #e2e0d8;
+  --text-muted: #8a8880;
+  --text-dim: #5a5852;
+  --accent-plan: #e8a44a;
+  --accent-design: #c77dff;
+  --accent-build: #4ecdc4;
+  --accent-validate: #45b7d1;
+  --accent-release: #f7768e;
+  --accent-monitor: #9ece6a;
+  --feedback: #b07acc;
+  --font-body: 'Newsreader', Georgia, serif;
+  --font-mono: 'DM Mono', 'Fira Code', monospace;
+  --max-width: 780px;
+  --trunk-left: 19px;
+  --pad-left: 52px;
+}
+@media (min-width: 600px) {
+  :root { --trunk-left: 27px; --pad-left: 68px; }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.72;
+  overflow-x: hidden;
+}
+::selection { background: rgba(78,205,196,0.25); }
+.container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+
+/* Header */
+header { padding: 80px 0 48px; position: relative; }
+header::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 400px;
+  background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(78,205,196,0.06) 0%, transparent 100%);
+  pointer-events: none;
+}
+h1 { font-size: clamp(42px,6vw,64px); font-weight: 600; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 20px; }
+.subtitle { font-size: 20px; color: var(--text-muted); max-width: 560px; line-height: 1.6; }
+.byline { margin-top: 32px; font-family: var(--font-mono); font-size: 13px; color: var(--text-dim); letter-spacing: 0.02em; }
+
+/* Prose */
+article h2 { font-size: 30px; font-weight: 500; margin: 56px 0 20px; letter-spacing: -0.01em; }
+article h3 { font-family: var(--font-mono); font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin: 36px 0 14px; }
+article p { margin-bottom: 18px; }
+article p.muted { color: var(--text-muted); font-size: 16px; }
+a { color: var(--accent-build); text-decoration: none; border-bottom: 1px solid rgba(78,205,196,0.25); transition: border-color 0.2s; }
+a:hover { border-color: var(--accent-build); }
+strong { font-weight: 500; color: #fff; }
+code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); border: 1px solid var(--border); padding: 2px 7px; border-radius: 4px; }
+hr { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+
+/* ================================
+   VERTICAL PIPELINE
+   ================================ */
+.pipeline { margin: 36px 0; position: relative; }
+.pipeline-trunk {
+  position: absolute; left: var(--trunk-left); top: 0; bottom: 0;
+  width: 2px; background: var(--border);
+}
+
+/* Phase row */
+.pp { position: relative; padding-left: var(--pad-left); padding-bottom: 4px; }
+.pp-dot {
+  position: absolute; left: calc(var(--trunk-left) - 8px); top: 17px;
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid var(--border); background: var(--bg); z-index: 2;
+  transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+}
+.pp.active .pp-dot {
+  border-color: var(--c); background: var(--c);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--c) 40%, transparent);
+}
+
+/* Gate bar */
+.pp-gate {
+  position: relative; padding-left: var(--pad-left);
+  height: 28px; display: flex; align-items: center;
+}
+.pp-gate::before {
+  content: ''; position: absolute; left: calc(var(--trunk-left) - 7px); top: 50%;
+  width: 16px; height: 2px; background: var(--accent-release); opacity: 0.35;
+}
+.pp-gate-label {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--accent-release); opacity: 0.45;
+}
+
+/* Feedback block inside phase cards */
+.fb {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(176,122,204,0.04);
+  border: 1px solid rgba(176,122,204,0.10);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.fb-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--feedback);
+  flex-shrink: 0;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.6;
+}
+.fb-target {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--feedback);
+  opacity: 0.8;
+}
+
+/* Feedback loops section diagram */
+.fl-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 24px 0;
+}
+.fl-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-elevated);
+}
+.fl-from, .fl-to {
+  padding: 14px 16px;
+  flex: 1;
+  min-width: 0;
+}
+.fl-from {
+  border-right: 1px solid var(--border);
+}
+.fl-phase {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+.fl-what {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+}
+.fl-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  font-family: var(--font-mono);
+  font-size: 16px;
+  color: var(--feedback);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+.fl-type {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+/* Card */
+.pp-card {
+  border: 1px solid var(--border); border-radius: 10px;
+  background: var(--bg-elevated); overflow: hidden;
+  transition: border-color 0.25s; cursor: pointer;
+}
+.pp-card:hover { border-color: var(--border-active); }
+.pp.active .pp-card { border-color: color-mix(in srgb, var(--c) 45%, transparent); }
+
+.pp-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px; user-select: none;
+}
+.pp-num { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); width: 24px; flex-shrink: 0; }
+.pp-name { font-family: var(--font-body); font-size: 19px; font-weight: 500; flex: 1; transition: color 0.25s; }
+.pp.active .pp-name { color: var(--c); }
+.pp-evt { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); display: none; }
+@media (min-width: 500px) { .pp-evt { display: block; } }
+.pp-chev { font-family: var(--font-mono); font-size: 16px; color: var(--text-dim); transition: transform 0.3s; flex-shrink: 0; }
+.pp.active .pp-chev { transform: rotate(90deg); }
+
+/* Expand */
+.pp-expand { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+.pp.active .pp-expand { max-height: 1400px; }
+.pp-body { padding: 0 18px 22px; }
+.pp-desc { font-size: 15px; line-height: 1.65; color: var(--text-muted); margin-bottom: 18px; }
+.dg { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 600px) { .dg { grid-template-columns: 1fr; } }
+.db { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+.db .l { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-dim); margin-bottom: 5px; }
+.db .v { font-size: 14px; line-height: 1.5; }
+.tag { display: inline-block; font-family: var(--font-mono); font-size: 11px; padding: 2px 8px; border-radius: 4px; margin: 2px 4px 2px 0; border: 1px solid var(--border); background: var(--bg); }
+
+.hc {
+  grid-column: 1 / -1; display: flex; align-items: flex-start; gap: 12px;
+  background: rgba(247,118,142,0.04); border: 1px solid rgba(247,118,142,0.10);
+  border-radius: 8px; padding: 12px 14px; font-size: 13px; line-height: 1.55;
+  color: var(--text-muted); margin-top: 2px;
+}
+.hc-label {
+  font-family: var(--font-mono); font-size: 10px; color: var(--accent-release);
+  flex-shrink: 0; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.6;
+}
+
+/* ================================
+   CONTEXT FLOW
+   ================================ */
+.cf-wrap {
+  margin: 32px 0; border: 1px solid var(--border); border-radius: 12px;
+  background: var(--bg-elevated); padding: 24px 18px;
+}
+@media (min-width: 600px) { .cf-wrap { padding: 32px 28px; } }
+.cf-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+.cf-head h4 { font-family: var(--font-body); font-size: 18px; font-weight: 500; }
+.cf-slider-wrap { display: flex; align-items: center; gap: 12px; }
+.cf-slider-wrap label { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; }
+input[type="range"] { -webkit-appearance: none; appearance: none; width: 180px; height: 4px; border-radius: 2px; background: var(--border); outline: none; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent-build); cursor: pointer; border: 2px solid var(--bg); }
+.cf-rows { display: flex; flex-direction: column; gap: 4px; }
+.cf-row { display: flex; align-items: flex-start; gap: 12px; padding: 8px 10px; border-radius: 6px; border: 1px solid transparent; transition: background 0.3s, border-color 0.3s, opacity 0.3s; min-height: 38px; }
+.cf-row.current { background: var(--bg-card); border-color: var(--border); }
+.cf-row.past { opacity: 0.45; }
+.cf-row.future { opacity: 0.15; }
+.cf-label { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; width: 68px; flex-shrink: 0; padding-top: 2px; color: var(--text-dim); transition: color 0.3s; }
+.cf-row.current .cf-label { color: var(--text); }
+.cf-chips { display: flex; flex-wrap: wrap; gap: 4px; flex: 1; }
+.cf-chip { font-family: var(--font-mono); font-size: 10px; padding: 3px 8px; border-radius: 4px; background: var(--bg); border: 1px solid var(--border); color: var(--text-muted); transition: opacity 0.25s, background 0.25s, border-color 0.25s; white-space: nowrap; }
+.cf-chip.new { background: var(--bg-card); border-color: var(--border-active); color: var(--text); }
+.cf-chip.hidden { opacity: 0; pointer-events: none; }
+.cf-summary { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); text-align: center; padding-top: 14px; margin-top: 10px; border-top: 1px solid var(--border); min-height: 32px; }
+
+/* Callouts */
+.callout { margin: 28px 0; padding: 20px 24px; border-radius: 8px; font-size: 15px; line-height: 1.6; }
+.callout.insight { background: rgba(78,205,196,0.04); border: 1px solid rgba(78,205,196,0.10); color: var(--text-muted); }
+.callout.warning { background: rgba(247,118,142,0.04); border: 1px solid rgba(247,118,142,0.10); color: var(--text-muted); }
+.callout .ct { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; color: var(--text-dim); }
+
+footer { padding: 80px 0; text-align: center; font-family: var(--font-mono); font-size: 13px; color: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <h1>A Human-centric Agentic SDLC</h1>
+    <p class="subtitle">A thinking framework for the new age of software.</p>
+    <p class="byline">Amos Haviv &middot; April 2026</p>
+  </div>
+</header>
+
+<main><article><div class="container">
+  
+  <p><i>Monday, 12:00, Grace the CEO of ACME Corp just finished their Q2 leadership meeting. The team decided it's time to build an integration with a major platform. An AI agent picks up the meeting summary and creates the first tickets, Grace's VP R&D approves them over Slack and kicks off development. At 14:00 Alan the PM gets notified about the ticket they've been assigned, the planning agent already picked up the details and is offering a few courses of action, Alan picks one, nudge it in the right direction and an hour later a PRD is ready, new tickets are created for the team. At 16:00, Ada, the team's architect is having her discussions over the right system design, it's going to require extended thinking and several sub agents, it's good those agents work over night. Tuesday, 10:00, Ada had her coffee and it's decision time, designs are ready, and it's time for the engineers to pick it up. Tuesday, 11:00, John is a backend engineer and he's picking up the webhook integration ticket. The coding agent codes, the testing agent writes the tests, John points out a few issues, and around 14:00 the pull request is ready to be reviewed. A review agent is preparing the review and John's team points out some missed edge cases, and by the end of the day the PR is ready to be merged. Wednesday, 10:00, the new integration is ready to be tested in the staging environment. It's 14:00, the testing agents find some issues and the team fixes those, by the Thursday morning it's time to release. Thursday, 10:00, The team is working with canary releases so the release agent verifies key KPIs are solid before full production releases, other tickets will go through the experimentation agents, but not this one. 17:00, It's been a full day, and the team gets notified the change is stable, time for a full production release. On Friday morning, the team fully releases the feature, for the next few weeks the monitoring agents will pay attention to business and technical metrics, if something comes up new tickets will be open, and the cycle will continue.</i></p>
+  
+  <h2>The new age of software</h2>
+
+  <p>By now it's clear the nature of software engineering is undergoing a fundamental change. For decades, the industry focused on making humans more efficient at writing code. We are now entering an era where the primary "writers" of code will be autonomous agents, and the primary role of the engineer is to architect, review, and validate.</p>
+
+  <p>This is not speculative. Top-tier engineering organizations are already retooling for this. Stripe is deploying <a href="https://stripe.dev/blog/minions-stripes-one-shot-end-to-end-coding-agents">Minions</a> for one-shot end-to-end coding tasks. Ramp built <a href="https://builders.ramp.com/post/why-we-built-our-background-agent">background agents</a> to handle the repetitive toil that usually slows teams down. We see companies like Cursor moving toward <a href="https://cursor.com/docs/cloud-agent">cloud agents</a> and a broader industry push toward <a href="https://background-agents.com">background agents</a> where models are "upstream", constantly proposing changes, and our pipelines are "downstream," acting as the high-fidelity filters for quality.</p>
+
+  <p>The data supports this: a <a href="https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/">METR study from early 2025</a> shows AI agents already performing at the level of experienced open-source developers on complex tasks. Industry leaders like <a href="https://x.com/karpathy/status/2026731645169185220">Andrej Karpathy</a> and <a href="https://x.com/mntruell/status/2026736314272591924">Michael Truell</a> point to a future where programming is less about syntax and more about managing these agents. As <a href="https://x.com/bcherny/status/2007179832300581177">Boris Cherny put it</a>, the shift is already here.</p>
+
+  <p>The software development lifecycle has always been a series of handoffs. A ticket becomes a plan, a plan becomes a design, a design becomes code, code becomes a release. At each step, context is transferred from one person or team to the next, and some of it is inevitably lost. AI agents are about to change the mechanics of these handoffs. Not by replacing the people involved, but by carrying context forward more reliably, doing the repetitive parts faster, and freeing humans to focus on the decisions that actually require judgment.</p>
+
+  <p>In this article I'll proposes a framework for thinking about where agents fit, what triggers them, what context they need, and critically, <b>where humans must stay in the loop.</b> It is opinionated where it should be and flexible where your organization needs it to be.</p>
+
+  <h2>The six phases</h2>
+
+  <p>The SDLC is not new. What changes with agents is how work flows between phases. Each phase has one primary agentic workflow, triggered by events and gated by human approvals where compliance or judgment demands it.</p>
+
+  <p class="muted">Click any phase to explore its agent workflow. The vertical flow shows forward progression. Purple pills mark feedback loops where work can return upstream.</p>
+
+  <div class="pipeline" id="pipeline">
+    <div class="pipeline-trunk"></div>
+
+    <!-- PLAN -->
+    <div class="pp" id="pp-plan" style="--c: var(--accent-plan);">
+      <div class="pp-dot"></div>
+      <div class="pp-card" onclick="toggle('plan')">
+        <div class="pp-head">
+          <span class="pp-num">01</span>
+          <span class="pp-name">Plan</span>
+          <span class="pp-evt">ticket created</span>
+          <span class="pp-chev">&#9656;</span>
+        </div>
+        <div class="pp-expand"><div class="pp-body">
+          <div class="pp-desc">Planning starts when a ticket is created. The agent turns a sparse ticket into a structured plan or PRD. For bugs: a root cause hypothesis and fix approach. For features: a full requirements document. The agent can ask clarifying questions back to the ticket creator before finalizing.</div>
+          <div class="dg">
+            <div class="db"><div class="l">Trigger Event</div><div class="v">Ticket created in tracking system (Jira, Linear, GitHub Issues)</div></div>
+            <div class="db"><div class="l">Context Inputs</div><div class="v"><span class="tag">ticket</span><span class="tag">codebase docs</span><span class="tag">past incidents</span><span class="tag">team context</span></div></div>
+            <div class="db"><div class="l">Tools</div><div class="v"><span class="tag">ticket system API</span><span class="tag">doc store</span><span class="tag">codebase search</span></div></div>
+            <div class="db"><div class="l">MCPs</div><div class="v"><span class="tag">Jira MCP</span><span class="tag">Linear MCP</span><span class="tag">Confluence MCP</span><span class="tag">Slack MCP</span><span class="tag">Google Docs MCP</span><span class="tag">Notion MCP</span></div></div>
+            <div class="db"><div class="l">Output</div><div class="v"><span class="tag">PRD</span><span class="tag">plan of action</span><span class="tag">updated ticket</span></div></div>
+            <div class="db"><div class="l">Owner</div><div class="v">Product manager or tech lead</div></div>
+            <div class="db"><div class="l">Sub-agents</div><div class="v">Clarification agent (asks questions), context gatherer (pulls related docs and tickets)</div></div>
+            <div class="hc"><span class="hc-label">gate</span><span><strong>Human gate:</strong> The plan or PRD must be reviewed and approved by the product owner before the ticket transitions to Design. The agent drafts; the human decides.</span></div>
+            <div class="fb"><span class="fb-label">feedback</span><span><strong>Receives from:</strong> Design (plan needs revision), Monitor (new ticket from anomaly or business change). Plan is the entry point for all long feedback loops.</span></div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="pp-gate"><span class="pp-gate-label">human approval required</span></div>
+
+    <!-- DESIGN -->
+    <div class="pp" id="pp-design" style="--c: var(--accent-design);">
+      <div class="pp-dot"></div>
+      <div class="pp-card" onclick="toggle('design')">
+        <div class="pp-head">
+          <span class="pp-num">02</span>
+          <span class="pp-name">Design</span>
+          <span class="pp-evt">plan approved</span>
+          <span class="pp-chev">&#9656;</span>
+        </div>
+        <div class="pp-expand"><div class="pp-body">
+          <div class="pp-desc">Design begins once the plan is approved. What "design" means depends on the work: UI/UX sketches for a frontend feature, system architecture for a backend change, database schema proposals for a data model change. The agent proposes design artifacts appropriate to the task type.</div>
+          <div class="dg">
+            <div class="db"><div class="l">Trigger Event</div><div class="v">Ticket moves to "Ready for Design" (plan approved)</div></div>
+            <div class="db"><div class="l">Context Inputs</div><div class="v"><span class="tag">ticket</span><span class="tag">PRD / plan</span><span class="tag">existing architecture</span><span class="tag">design system</span></div></div>
+            <div class="db"><div class="l">Tools</div><div class="v"><span class="tag">codebase search</span><span class="tag">diagram tools</span><span class="tag">design system refs</span></div></div>
+            <div class="db"><div class="l">MCPs</div><div class="v"><span class="tag">Figma MCP</span><span class="tag">Confluence MCP</span><span class="tag">Google Docs MCP</span><span class="tag">Notion MCP</span><span class="tag">GitHub MCP</span><span class="tag">Jira MCP</span></div></div>
+            <div class="db"><div class="l">Output</div><div class="v"><span class="tag">system design</span><span class="tag">DB schema</span><span class="tag">wireframes</span><span class="tag">API contracts</span></div></div>
+            <div class="db"><div class="l">Owner</div><div class="v">Designer, architect, or senior engineer (depends on task type)</div></div>
+            <div class="db"><div class="l">Sub-agents</div><div class="v">Architecture analyzer, compatibility checker, schema validator</div></div>
+            <div class="hc"><span class="hc-label">collab</span><span><strong>Human involvement:</strong> Design review is collaborative. The agent proposes, the designer or architect iterates. The human owns the final design decision.</span></div>
+            <div class="fb"><span class="fb-label">feedback</span><span><strong>Sends to:</strong> Plan (if requirements are incomplete or contradictory). <strong>Receives from:</strong> Build (if implementation reveals the design is infeasible).</span></div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- BUILD -->
+    <div class="pp" id="pp-build" style="--c: var(--accent-build);">
+      <div class="pp-dot"></div>
+      <div class="pp-card" onclick="toggle('build')">
+        <div class="pp-head">
+          <span class="pp-num">03</span>
+          <span class="pp-name">Build</span>
+          <span class="pp-evt">design ready</span>
+          <span class="pp-chev">&#9656;</span>
+        </div>
+        <div class="pp-expand"><div class="pp-body">
+          <div class="pp-desc">Build is where most organizations start with agents, and it is the most mature phase. The agent receives all prior context and produces code changes. For multi-service changes, sub-agents can work in parallel. The output is one or more merge requests, not merged code.</div>
+          <div class="dg">
+            <div class="db"><div class="l">Trigger Event</div><div class="v">Ticket moves to "Ready for Implementation" (design approved)</div></div>
+            <div class="db"><div class="l">Context Inputs</div><div class="v"><span class="tag">ticket</span><span class="tag">PRD</span><span class="tag">design artifacts</span><span class="tag">codebase</span><span class="tag">test suite</span></div></div>
+            <div class="db"><div class="l">Tools</div><div class="v"><span class="tag">SCM (Git)</span><span class="tag">IDE / code agent</span><span class="tag">CI pipeline</span><span class="tag">package registry</span></div></div>
+            <div class="db"><div class="l">MCPs</div><div class="v"><span class="tag">GitHub MCP</span><span class="tag">GitLab MCP</span><span class="tag">Jira MCP</span><span class="tag">Slack MCP</span><span class="tag">Sentry MCP</span><span class="tag">PostgreSQL MCP</span></div></div>
+            <div class="db"><div class="l">Output</div><div class="v"><span class="tag">merge request(s)</span><span class="tag">code changes</span><span class="tag">unit tests</span><span class="tag">changelog</span></div></div>
+            <div class="db"><div class="l">Owner</div><div class="v">Engineer, EM, or SRE depending on scope</div></div>
+            <div class="db"><div class="l">Sub-agents</div><div class="v">Code writer (per service), test generator, PR description writer, lint and format agent</div></div>
+            <div class="hc"><span class="hc-label">review</span><span><strong>Human involvement:</strong> Code review remains human-owned. AI can assist with review, but a human must approve the merge request. Agents produce MRs; humans merge them.</span></div>
+            <div class="fb"><span class="fb-label">feedback</span><span><strong>Sends to:</strong> Design (if the design is infeasible). <strong>Receives from:</strong> Validate (test failures, security issues return here with failure context).</span></div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- VALIDATE -->
+    <div class="pp" id="pp-validate" style="--c: var(--accent-validate);">
+      <div class="pp-dot"></div>
+      <div class="pp-card" onclick="toggle('validate')">
+        <div class="pp-head">
+          <span class="pp-num">04</span>
+          <span class="pp-name">Validate</span>
+          <span class="pp-evt">MR opened</span>
+          <span class="pp-chev">&#9656;</span>
+        </div>
+        <div class="pp-expand"><div class="pp-body">
+          <div class="pp-desc">Validation ensures the change is safe for release. This is where agents shine in parallel: unit tests, integration tests, security scans, compliance checks, and change management validation all run concurrently. If validation fails, the feedback loop sends work back to Build with specific failure context.</div>
+          <div class="dg">
+            <div class="db"><div class="l">Trigger Event</div><div class="v">Merge request opened or updated (CI pipeline triggered)</div></div>
+            <div class="db"><div class="l">Context Inputs</div><div class="v"><span class="tag">ticket</span><span class="tag">PRD</span><span class="tag">design</span><span class="tag">code diff</span><span class="tag">MR metadata</span><span class="tag">test history</span></div></div>
+            <div class="db"><div class="l">Tools</div><div class="v"><span class="tag">CI/CD</span><span class="tag">test runners</span><span class="tag">SAST / DAST</span><span class="tag">staging env</span></div></div>
+            <div class="db"><div class="l">MCPs</div><div class="v"><span class="tag">GitHub MCP</span><span class="tag">GitLab MCP</span><span class="tag">Snyk MCP</span><span class="tag">SonarQube MCP</span><span class="tag">Jira MCP</span><span class="tag">Slack MCP</span></div></div>
+            <div class="db"><div class="l">Output</div><div class="v"><span class="tag">test results</span><span class="tag">security report</span><span class="tag">compliance sign-off</span><span class="tag">release candidate</span></div></div>
+            <div class="db"><div class="l">Owner</div><div class="v">Engineer, QA, or change management (depends on org)</div></div>
+            <div class="db"><div class="l">Sub-agents</div><div class="v">Test agent, security scanner, compliance validator, performance profiler (parallel)</div></div>
+            <div class="hc"><span class="hc-label">gate</span><span><strong>Human gate:</strong> Change management and compliance approvals typically require human sign-off (SOC 2, SOX, HIPAA). The agent prepares the evidence package; a human approves the release candidate.</span></div>
+            <div class="fb"><span class="fb-label">feedback</span><span><strong>Sends to:</strong> Build (on any test, security, or compliance failure). This is the most frequent feedback loop and can often be automated for simple failures like lint or unit test regressions.</span></div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="pp-gate"><span class="pp-gate-label">human approval required</span></div>
+
+    <!-- RELEASE -->
+    <div class="pp" id="pp-release" style="--c: var(--accent-release);">
+      <div class="pp-dot"></div>
+      <div class="pp-card" onclick="toggle('release')">
+        <div class="pp-head">
+          <span class="pp-num">05</span>
+          <span class="pp-name">Release</span>
+          <span class="pp-evt">validation passed</span>
+          <span class="pp-chev">&#9656;</span>
+        </div>
+        <div class="pp-expand"><div class="pp-body">
+          <div class="pp-desc">Release gets the change to production. The approach varies by organization: canary deployments, blue-green, feature flags, app store submissions, experiment rollouts. This phase has the highest blast radius and the least agent maturity. Agents can orchestrate the mechanics, but the go/no-go decision stays with humans.</div>
+          <div class="dg">
+            <div class="db"><div class="l">Trigger Event</div><div class="v">Validation passed + human approval (release candidate approved)</div></div>
+            <div class="db"><div class="l">Context Inputs</div><div class="v"><span class="tag">all prior artifacts</span><span class="tag">release candidate</span><span class="tag">rollback plan</span><span class="tag">deploy config</span></div></div>
+            <div class="db"><div class="l">Tools</div><div class="v"><span class="tag">deploy pipeline</span><span class="tag">feature flags</span><span class="tag">canary system</span></div></div>
+            <div class="db"><div class="l">MCPs</div><div class="v"><span class="tag">GitHub MCP</span><span class="tag">GitLab MCP</span><span class="tag">Cloudflare MCP</span><span class="tag">AWS MCP</span><span class="tag">Slack MCP</span><span class="tag">PagerDuty MCP</span></div></div>
+            <div class="db"><div class="l">Output</div><div class="v"><span class="tag">deploy receipt</span><span class="tag">canary metrics</span><span class="tag">release notes</span><span class="tag">rollback artifact</span></div></div>
+            <div class="db"><div class="l">Owner</div><div class="v">Release engineer, SRE, or on-call engineer</div></div>
+            <div class="db"><div class="l">Sub-agents</div><div class="v">Deployment executor, canary monitor, rollback agent (triggered on failure)</div></div>
+            <div class="hc"><span class="hc-label">gate</span><span><strong>Human gate:</strong> Production deployment authority stays with humans. The agent prepares everything and monitors the canary, but the go/no-go and rollback decisions involve a human.</span></div>
+            <div class="fb"><span class="fb-label">feedback</span><span><strong>Sends to:</strong> Validate (canary failure triggers rollback and re-validation). In severe cases, may loop all the way back to Build or even Plan.</span></div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- MONITOR -->
+    <div class="pp" id="pp-monitor" style="--c: var(--accent-monitor);">
+      <div class="pp-dot"></div>
+      <div class="pp-card" onclick="toggle('monitor')">
+        <div class="pp-head">
+          <span class="pp-num">06</span>
+          <span class="pp-name">Monitor</span>
+          <span class="pp-evt">deployed</span>
+          <span class="pp-chev">&#9656;</span>
+        </div>
+        <div class="pp-expand"><div class="pp-body">
+          <div class="pp-desc">Monitoring is the healthy idle state. The system watches for technical regressions (errors, latency, resource usage) and business impact (conversion changes, revenue shifts). In an ideal world, this extends to market dynamics and competitive changes. The most important output is sometimes nothing at all, and sometimes a new ticket, closing the loop.</div>
+          <div class="dg">
+            <div class="db"><div class="l">Trigger Event</div><div class="v">Deployment complete (continuous, event-driven on anomalies)</div></div>
+            <div class="db"><div class="l">Context Inputs</div><div class="v"><span class="tag">full product state</span><span class="tag">metrics / logs</span><span class="tag">business KPIs</span><span class="tag">recent changes</span></div></div>
+            <div class="db"><div class="l">Tools</div><div class="v"><span class="tag">observability platform</span><span class="tag">alerting</span><span class="tag">analytics</span></div></div>
+            <div class="db"><div class="l">MCPs</div><div class="v"><span class="tag">Datadog MCP</span><span class="tag">PagerDuty MCP</span><span class="tag">Sentry MCP</span><span class="tag">Jira MCP</span><span class="tag">Slack MCP</span><span class="tag">Grafana MCP</span></div></div>
+            <div class="db"><div class="l">Output</div><div class="v"><span class="tag">new ticket</span><span class="tag">incident report</span><span class="tag">health dashboard</span><span class="tag">or: nothing (healthy)</span></div></div>
+            <div class="db"><div class="l">Owner</div><div class="v">Product or business owner, SRE for technical monitoring</div></div>
+            <div class="db"><div class="l">Sub-agents</div><div class="v">Anomaly detector, root cause analyzer, ticket creator, business impact assessor</div></div>
+            <div class="hc"><span class="hc-label">loop</span><span><strong>Human involvement:</strong> The monitoring agent surfaces issues; humans decide priority and response. When the agent creates a new ticket, it closes the SDLC loop and the cycle starts again at Plan.</span></div>
+            <div class="fb"><span class="fb-label">feedback</span><span><strong>Sends to:</strong> Plan (new ticket from anomaly, business shift, or competitive change). This is the long loop that makes the SDLC a cycle, not a line.</span></div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- Feedback: Monitor creates new ticket back to Plan -->
+    <div class="pp-loop">
+      <span class="pp-loop-pill"><span class="pp-loop-arrow">&#8593;</span> new ticket &mdash; back to Plan</span>
+    </div>
+
+  </div><!-- /pipeline -->
+
+  <hr>
+
+  <h2>Feedback loops</h2>
+
+  <p>The pipeline above reads top to bottom, but real work does not always move forward. Feedback loops are how the system self-corrects. Some loops are short and frequent, happening many times within a single ticket. Others are long, spanning the entire lifecycle when monitoring discovers something that needs new work.</p>
+
+  <h3>Short loops (within a ticket)</h3>
+
+  <p>These happen constantly and are often fully automated. They are the inner engine of quality.</p>
+
+  <div class="fl-grid">
+    <div class="fl-row">
+      <div class="fl-from">
+        <div class="fl-phase" style="color: var(--accent-validate);">Validate</div>
+        <div class="fl-what">Tests fail, security scan finds issues, or lint errors detected</div>
+      </div>
+      <div class="fl-arrow">&rarr;</div>
+      <div class="fl-to">
+        <div class="fl-phase" style="color: var(--accent-build);">Build</div>
+        <div class="fl-what">Agent receives failure context and attempts a fix, or human is notified</div>
+        <div class="fl-type">high frequency, often automated</div>
+      </div>
+    </div>
+    <div class="fl-row">
+      <div class="fl-from">
+        <div class="fl-phase" style="color: var(--accent-design);">Design</div>
+        <div class="fl-what">Architecture review reveals the plan is incomplete or contradictory</div>
+      </div>
+      <div class="fl-arrow">&rarr;</div>
+      <div class="fl-to">
+        <div class="fl-phase" style="color: var(--accent-plan);">Plan</div>
+        <div class="fl-what">Plan is revised with new constraints discovered during design</div>
+        <div class="fl-type">moderate frequency, human-driven</div>
+      </div>
+    </div>
+    <div class="fl-row">
+      <div class="fl-from">
+        <div class="fl-phase" style="color: var(--accent-build);">Build</div>
+        <div class="fl-what">Implementation reveals the design is infeasible or under-specified</div>
+      </div>
+      <div class="fl-arrow">&rarr;</div>
+      <div class="fl-to">
+        <div class="fl-phase" style="color: var(--accent-design);">Design</div>
+        <div class="fl-what">Design is updated to accommodate implementation reality</div>
+        <div class="fl-type">moderate frequency, human-driven</div>
+      </div>
+    </div>
+    <div class="fl-row">
+      <div class="fl-from">
+        <div class="fl-phase" style="color: var(--accent-release);">Release</div>
+        <div class="fl-what">Canary deployment shows degraded metrics or errors</div>
+      </div>
+      <div class="fl-arrow">&rarr;</div>
+      <div class="fl-to">
+        <div class="fl-phase" style="color: var(--accent-validate);">Validate</div>
+        <div class="fl-what">Rollback triggered, additional validation needed before next attempt</div>
+        <div class="fl-type">low frequency, high urgency</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Long loops (across the lifecycle)</h3>
+
+  <p>These close the full cycle. They are the reason the SDLC is a loop and not a line.</p>
+
+  <div class="fl-grid">
+    <div class="fl-row">
+      <div class="fl-from">
+        <div class="fl-phase" style="color: var(--accent-monitor);">Monitor</div>
+        <div class="fl-what">Anomaly detected: error rate spike, conversion drop, or performance regression after deploy</div>
+      </div>
+      <div class="fl-arrow">&rarr;</div>
+      <div class="fl-to">
+        <div class="fl-phase" style="color: var(--accent-plan);">Plan</div>
+        <div class="fl-what">New ticket created automatically with incident context, starting the cycle again</div>
+        <div class="fl-type">the defining loop of the SDLC</div>
+      </div>
+    </div>
+    <div class="fl-row">
+      <div class="fl-from">
+        <div class="fl-phase" style="color: var(--accent-monitor);">Monitor</div>
+        <div class="fl-what">Business KPIs shift: competitor launches feature, market conditions change, user behavior evolves</div>
+      </div>
+      <div class="fl-arrow">&rarr;</div>
+      <div class="fl-to">
+        <div class="fl-phase" style="color: var(--accent-plan);">Plan</div>
+        <div class="fl-what">Strategic ticket created by product, informed by monitoring data</div>
+        <div class="fl-type">low frequency, high impact</div>
+      </div>
+    </div>
+  </div>
+
+  <p>The key design decision is: which feedback loops should agents handle autonomously, and which require human judgment? A good default: short loops within Build-Validate (test failures, lint fixes) can be automated. Everything else should notify a human and wait for a decision.</p>
+
+  <hr>
+
+  <h2>Context accumulates</h2>
+
+  <p>One of the hardest problems in the agentic SDLC is context management. Each phase produces artifacts that downstream phases need. By the time you reach Release, an agent needs access to the ticket, the plan, the design artifacts, the code changes, the test results, and the compliance evidence.</p>
+
+  <p class="muted">Use the slider to move through the phases and see how context accumulates. New artifacts produced at each phase are highlighted.</p>
+
+  <div class="cf-wrap">
+    <div class="cf-head">
+      <h4>Context accumulation across phases</h4>
+      <div class="cf-slider-wrap">
+        <label>Phase</label>
+        <input type="range" id="cfSlider" min="0" max="5" value="0" step="1">
+      </div>
+    </div>
+    <div class="cf-rows" id="cfRows"></div>
+    <div class="cf-summary" id="cfSum"></div>
+  </div>
+
+  <p>The practical approaches to managing this context range from simple to complex. Most teams should start at the simple end:</p>
+
+  <div class="callout insight">
+    <div class="ct">Context management spectrum</div>
+    <strong>Simple:</strong> Agents access tools directly (Jira API, Google Docs, Git) and pull context on demand. A summary of prior phases is passed as part of the agent's initial prompt. This works for most teams and keeps infrastructure minimal.<br><br>
+    <strong>Advanced:</strong> A shared state store (vector DB, knowledge graph) where each phase deposits structured artifacts. Agents query semantically for relevant context rather than receiving everything. This becomes necessary when the volume of artifacts exceeds what fits in an agent's context window.
+  </div>
+
+  <p>Start with tool access. Let agents pull what they need from the systems that already hold the information. You can always add a shared state layer later when context volume forces the issue. You almost never need to add it upfront.</p>
+
+  <hr>
+
+  <h2>Orchestration: keep it boring</h2>
+
+  <p>There is a strong temptation to over-engineer orchestration. Multi-agent frameworks, complex message buses, dynamic agent routing. The evidence is clear: the teams that succeed start simple.</p>
+
+  <p>The simplest orchestration pattern that works for the SDLC is a sequential pipeline with human checkpoints, backed by your existing ticket system as the state machine. The ticket's status field <em>is</em> the orchestration. When a ticket moves to "Ready for Design," the design agent activates. When an MR is opened, the validation agents run. When validation passes and a human approves, the release pipeline fires.</p>
+
+  <div class="callout insight">
+    <div class="ct">The opinionated default</div>
+    Use your ticket system as the orchestrator. Ticket status transitions are your events. CI/CD pipelines are your agent runners. Git branches provide isolation for parallel agent work. Message queues (SQS, Kafka, etc.) are for when you outgrow this, not for when you start.
+  </div>
+
+  <p>When you do need more sophisticated orchestration, a simple message queue gives you everything: decoupled phases, retry logic, dead letter queues for failed agent runs, and the ability to scale agents independently. But most organizations are not there yet, and pretending you are will cost you more in complexity than it saves in efficiency.</p>
+
+  <hr>
+
+  <h2>Your org already has the right structure</h2>
+
+  <p>There is a recurring pattern in how companies approach AI adoption. A leadership directive arrives: we need to be AI-first. An AI enablement team is formed, or an existing platform team is given the mandate. Within weeks, that team is drowning. Every department wants something. Product wants AI-generated specs. Engineering wants coding agents. QA wants automated test generation. Ops wants intelligent alerting. The enablement team becomes a bottleneck, trying to build bespoke AI solutions for every team in the company while everyone waits.</p>
+
+  <p>This is the wrong model. It fails for the same reason it fails when a platform team tries to build every internal tool themselves instead of providing the platform that lets other teams build what they need.</p>
+
+  <p>The agentic SDLC framework does not require a new organizational structure. It requires the existing one to work the way it already should. Product people still own planning. Designers and architects still own design. Engineers still own building and validating. SREs still own releases and monitoring. What changes is not who does the work, but what tools they have.</p>
+
+  <div class="callout insight">
+    <div class="ct">The AI enablement team's real job</div>
+    The AI enablement team (or platform team, or developer experience team) should not be building agents for every phase of the SDLC. Their job is to provide the infrastructure: the LLM access layer, the cost controls, the observability tooling, the secure execution environments, and the guardrails. Then each domain team configures and steers the agents for their own phase, because they are the ones with the domain knowledge to do it well.
+  </div>
+
+  <p>A product manager knows what makes a good PRD for their domain. A senior engineer knows what patterns belong in their codebase and what does not. An SRE knows what healthy looks like for their services. No central AI team can replicate that knowledge. What the central team can do is make it easy for those experts to plug their knowledge into agent workflows: prompt templates, system instructions, tool access, and evaluation criteria.</p>
+
+  <p>This is the same model that made platform engineering successful. The platform team does not write your CI pipelines. They give you the CI system, the runners, the security scanning integration, and the deployment targets. Your team writes the pipeline that fits your service. The agentic SDLC works the same way. The enablement team provides the agent infrastructure. Your team provides the expertise that makes the agents useful.</p>
+
+  <p>The organizational benefit is that domain knowledge stays where it belongs: distributed across the people who actually do the work. The community of practice between product managers, the design review culture, the engineering guild that maintains coding standards, the on-call rotation that knows production inside out. None of that needs to be replaced. All of it becomes the guidance layer that makes agents effective rather than dangerous.</p>
+
+  <div class="callout warning">
+    <div class="ct">The centralization trap</div>
+    If your AI enablement team is writing prompts for other teams, configuring agents on their behalf, and fielding every request as a ticket in their own backlog, you have recreated the pre-DevOps model where ops was a separate team you threw work over the wall to. Decentralize the expertise. Centralize the infrastructure.
+  </div>
+
+  <hr>
+
+  <h2>The manual parts matter most</h2>
+
+  <p>The most counterintuitive insight about the agentic SDLC is this: <strong>the manual parts are not the weakness. They are the strength.</strong> Human approval gates exist because judgment, accountability, and compliance cannot be automated away.</p>
+
+  <p>Agents work well with good guidance. They work poorly without it. The humans in the loop are not bottlenecks to be optimized away. They are the guidance system. A plan that no product person has read will produce the wrong feature. Code that no engineer has reviewed will accumulate debt. A deployment that no SRE has approved will eventually take down production.</p>
+
+  <div class="callout warning">
+    <div class="ct">The approval fatigue trap</div>
+    As agents produce more output faster, the risk shifts from "not enough automation" to "too many approvals rubber-stamped." If your humans are approving 50 agent-generated MRs a day without reading them, you do not have an agentic SDLC. You have an automated one with a decorative human in the loop. Design your approval workflows so that the number of decisions stays manageable and each one gets real attention.
+  </div>
+
+  <hr>
+
+  <h2>Observability: you cannot manage what you cannot see</h2>
+
+  <p>When agents do the work, humans need to see what happened. This is not optional. Observability in the agentic SDLC covers three layers:</p>
+
+  <div class="callout insight">
+    <div class="ct">Three layers of agent observability</div>
+    <strong>Orchestration:</strong> Which agents ran, in what order, with what inputs, and what they produced. This is your audit trail.<br><br>
+    <strong>Operation:</strong> How each agent behaved: token usage, latency, tool calls, error rates, retries. This is your cost and reliability signal.<br><br>
+    <strong>Output:</strong> The quality of what agents produced: were the tests meaningful, was the code reviewable, did the PRD capture the intent? This requires human evaluation, at least for now.
+  </div>
+
+  <p>The operational layer is especially important for cost control. Multi-agent setups can consume 4 to 15 times more compute than single-turn workflows. Without per-agent cost tracking, teams discover they have a problem only when the invoice arrives.</p>
+
+  <hr>
+
+  <h2>Security: agents need sandboxes too</h2>
+
+  <p>Every agent that writes code, runs tests, or deploys changes needs a secure execution environment. The security model should follow the principle of least privilege: agents start with read-only access and earn write permissions through demonstrated reliability and appropriate human oversight.</p>
+
+  <p>A planning agent that reads tickets and writes documents is low risk. A build agent that pushes to Git is medium risk. A release agent that deploys to production is high risk. Each level demands different isolation, different approval flows, and different monitoring. This is a deep topic that deserves its own treatment, but the key principle is: treat agent permissions like you treat employee permissions. Scope them tightly and audit them continuously.</p>
+
+  <hr>
+
+  <h2>Where to start</h2>
+
+  <p>You do not need to build all six phases at once. Start where the technology is most mature and the organizational risk is lowest:</p>
+
+  <div class="callout insight">
+    <div class="ct">Adoption sequence (suggested)</div>
+    <strong>Phase 1:</strong> Build + Validate. Code generation and automated testing are the most mature agent capabilities. Start here. Measure cycle time and defect rates.<br><br>
+    <strong>Phase 2:</strong> Plan. Structured spec generation from tickets. This improves the quality of everything downstream.<br><br>
+    <strong>Phase 3:</strong> Monitor. Anomaly detection and incident triage. These agents work best with historical data, so give them time to learn your system.<br><br>
+    <strong>Phase 4:</strong> Design + Release. These require the most organizational trust and the deepest system context. Earn that trust with the earlier phases first.
+  </div>
+
+  <hr>
+
+  <h2>The work ahead</h2>
+
+  <p>The agentic SDLC is not a product you buy or a switch you flip. It is a way of thinking about where AI fits into the work your organization already does. The phases are the same ones you have always had. The people are the same ones who have always done the work. What changes is the tooling between them: agents that carry context forward, automate the repetitive, and surface what needs human attention.</p>
+
+  <p>The organizations that will get this right are the ones that resist two temptations. The first is to automate everything and remove humans from the loop. The second is to centralize everything and build a single AI team that becomes a bottleneck for the entire company. The better path is to distribute the capability, keep the expertise where it lives, and invest in the infrastructure that makes agents safe, observable, and accountable.</p>
+
+  <p>Start with one phase. Measure what changes. Expand when you have evidence, not enthusiasm. The SDLC has survived every technology shift for decades because its structure reflects how software actually gets built: in stages, with feedback, by people who care about the outcome. Agents do not change that. They just make the stages faster and the feedback tighter.</p>
+
+  <p>The people still matter most. Build accordingly.</p>
+
+</div></article></main>
+
+<footer><div class="container">Amos Haviv &middot; 2026</div></footer>
+
+<script>
+function toggle(p) {
+  const el = document.getElementById('pp-' + p);
+  const wasActive = el.classList.contains('active');
+  document.querySelectorAll('.pp').forEach(x => x.classList.remove('active'));
+  if (!wasActive) {
+    el.classList.add('active');
+    setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
+  }
+}
+
+// Context accumulation
+const PH = [
+  { id:'plan', label:'Plan', color:'#e8a44a', a:['ticket','PRD / plan','questions log'] },
+  { id:'design', label:'Design', color:'#c77dff', a:['system design','DB schema','API contracts'] },
+  { id:'build', label:'Build', color:'#4ecdc4', a:['code changes','merge request','unit tests'] },
+  { id:'validate', label:'Validate', color:'#45b7d1', a:['test results','security report','compliance'] },
+  { id:'release', label:'Release', color:'#f7768e', a:['deploy receipt','canary metrics','release notes'] },
+  { id:'monitor', label:'Monitor', color:'#9ece6a', a:['health status','incident report?','new ticket?'] }
+];
+
+const cfRows = document.getElementById('cfRows');
+const cfSlider = document.getElementById('cfSlider');
+const cfSum = document.getElementById('cfSum');
+
+PH.forEach((ph, pi) => {
+  const row = document.createElement('div');
+  row.className = 'cf-row';
+  row.dataset.i = pi;
+  const lbl = document.createElement('div');
+  lbl.className = 'cf-label';
+  lbl.textContent = ph.label;
+  row.appendChild(lbl);
+  const chips = document.createElement('div');
+  chips.className = 'cf-chips';
+  for (let j = 0; j <= pi; j++) {
+    PH[j].a.forEach(a => {
+      const c = document.createElement('div');
+      c.className = 'cf-chip';
+      c.textContent = a;
+      c.dataset.from = j;
+      c.dataset.own = j === pi ? '1' : '0';
+      chips.appendChild(c);
+    });
+  }
+  row.appendChild(chips);
+  cfRows.appendChild(row);
+});
+
+function updateCF(active) {
+  cfRows.querySelectorAll('.cf-row').forEach(row => {
+    const i = +row.dataset.i;
+    row.classList.remove('current','past','future');
+    row.classList.add(i === active ? 'current' : i < active ? 'past' : 'future');
+    row.querySelector('.cf-label').style.color = i === active ? PH[i].color : '';
+    row.querySelectorAll('.cf-chip').forEach(c => {
+      const from = +c.dataset.from;
+      c.classList.toggle('hidden', from > active);
+      c.classList.toggle('new', c.dataset.own === '1' && i === active);
+    });
+  });
+  let n = 0;
+  for (let i = 0; i <= active; i++) n += PH[i].a.length;
+  cfSum.textContent = PH[active].label + ' phase \u2014 agent has access to ' + n + ' artifact' + (n!==1?'s':'') + ' from ' + (active+1) + ' phase' + (active>0?'s':'');
+}
+
+cfSlider.addEventListener('input', e => updateCF(+e.target.value));
+updateCF(0);
+</script>
+
+</body>
+</html>
