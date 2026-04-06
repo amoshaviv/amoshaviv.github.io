@@ -621,7 +621,7 @@ On Friday morning, the team fully releases the feature. For the next few weeks t
       </div>
     </div>
     <div class="cf-rows" id="cfRows"></div>
-    <div class="cf-summary" id="cfSum"></div>
+    <!-- <div class="cf-summary" id="cfSum"></div> -->
   </div>
 
   <p>The practical approaches to managing this context range from simple to complex. Most teams should start at the simple end:</p>
@@ -802,13 +802,13 @@ function updateCF(active) {
       c.classList.toggle('new', c.dataset.own === '1' && i === active);
     });
   });
-  let n = 0;
-  for (let i = 0; i <= active; i++) n += PH[i].a.length;
-  cfSum.textContent = PH[active].label + ' phase \u2014 agent has access to ' + n + ' artifact' + (n!==1?'s':'') + ' from ' + (active+1) + ' phase' + (active>0?'s':'');
+  // let n = 0;
+  // for (let i = 0; i <= active; i++) n += PH[i].a.length;
+  // cfSum.textContent = PH[active].label + ' phase \u2014 agent has access to ' + n + ' artifact' + (n!==1?'s':'') + ' from ' + (active+1) + ' phase' + (active>0?'s':'');
 }
 
-//cfSlider.addEventListener('input', e => updateCF(+e.target.value));
-//updateCF(0);
+cfSlider.addEventListener('input', e => updateCF(+e.target.value));
+updateCF(0);
 </script>
 
 </body>
