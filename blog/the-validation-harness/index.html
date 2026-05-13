@@ -965,9 +965,9 @@
 
 <p>That is the baseline. From there, the shape varies with what your team actually ships. A few concrete examples to make the point.</p>
 
-<p><strong>A fintech team handling payments and KYC</strong> adds a compliance agent for PCI DSS, PSD2, SOX, and the relevant local regulator. They add a behavioral agent that replays a slice of anonymized production transactions against the change, looking for monetary drift, rounding errors, or currency edge cases. Audit trail integrity becomes a validator. The summarizer learns to weight financial-impact findings heavily because the cost of a missed bug is denominated in actual money.</p>
+<p><strong>A fintech team handling payments and KYC</strong> adds a compliance agent for PCI DSS, PSD2, SOX, and the relevant local regulator. They add a behavioral agent that replays a slice of anonymized production transactions against the change, looking for monetary drift, rounding errors, or currency edge cases. Audit trail integrity becomes a validator. A data-migration safety agent sits alongside the functional layer, flagging schema changes that would lock a hot ledger table during peak hours or backfill a column without a chunked plan — the kind of migration that passes review and bricks production at 3am. The summarizer learns to weight financial-impact findings heavily because the cost of a missed bug is denominated in actual money.</p>
 
-<p><strong>A team at a regulated enterprise shipping a mobile app</strong> adds a compliance agent for the policies they answer to (SOC 2, HIPAA, GDPR, the EU AI Act's tiered obligations, internal data residency rules). They add an app-store policy agent that knows about Apple's Guideline 5.1.2(i) on third-party AI disclosure (which <a href="https://dev.to/arshtechpro/apples-guideline-512i-the-ai-data-sharing-rule-that-will-impact-every-ios-developer-1b0p" target="_blank" rel="noopener">quietly landed in November 2025</a>) and Google Play Protect's ML policy checks. They add a behavioral agent that watches crash rates and battery impact across representative device profiles.</p>
+<p><strong>A team at a regulated enterprise shipping a mobile app</strong> adds a compliance agent for the policies they answer to (SOC 2, HIPAA, GDPR, the EU AI Act's tiered obligations, internal data residency rules). They add an app-store policy agent that knows about Apple's Guideline 5.1.2(i) on third-party AI disclosure (which <a href="https://dev.to/arshtechpro/apples-guideline-512i-the-ai-data-sharing-rule-that-will-impact-every-ios-developer-1b0p" target="_blank" rel="noopener">quietly landed in November 2025</a>) and Google Play Protect's ML policy checks. They add a behavioral agent that watches crash rates and battery impact across representative device profiles. An accessibility validator becomes load-bearing in this profile — the EU Accessibility Act bound consumer mobile apps from June 2025 and ADA Title III suits against inaccessible apps keep climbing — and a design-regression validator catches the UI drift across device sizes that crash reports never surface.</p>
 
 <p><strong>A team shipping an agentic product</strong> adds a red-team agent as one of its most important validators. The red-teamer argues against every change from a permanent oppositional role, generating prompt injections, jailbreak attempts, and malformed tool inputs. They probably also wrap a model evaluation harness as a validator, since they ship prompts and tools alongside code, and a prompt regression is functionally identical to a code regression.</p>
 
@@ -975,7 +975,9 @@
 
 <p><strong>A games studio shipping a live-ops title</strong> adds a cheat-detection validator that flags changes affecting server authority or client trust boundaries. They add an anti-tampering agent for the client binary, a console certification agent for platform requirements, and a live-ops regression agent that replays a slice of player traffic against the change.</p>
 
-<p><strong>An open source maintainer drowning in AI-generated PRs</strong> needs the harness less for catching deep bugs and more for triage. The functional agent here is the single most important layer. Did the PR actually run? Did the tests pass? Did the contributor touch files they have never touched before? That last signal alone is often enough to deprioritize most of the slop.</p>
+<p><strong>An open source maintainer drowning in AI-generated PRs</strong> needs the harness less for catching deep bugs and more for triage. The functional agent here is the single most important layer. Did the PR actually run? Did the tests pass? Did the contributor touch files they have never touched before? That last signal alone is often enough to deprioritize most of the slop. A documentation-drift validator catches the next most common signal: a contributor's diff lands without touching the README, the OpenAPI spec, or the examples that still reference the old shape. A license and SBOM validator catches the more dangerous version, where AI-generated code pastes in a copyleft snippet with no provenance.</p>
+
+<p>Across all of these, two layers tend to get added once teams have lived with the harness for a quarter. A <strong>telemetry and observability validator</strong> that checks every new code path emits the traces, metrics, and structured logs that on-call will need at the right cardinality — the layer that makes sure a silent regression in prod actually looks loud. And the inverse of the security layer: a <strong>license and SBOM validator</strong> that asks not "is this safe to run" but "is this safe to ship," catching copyleft contamination and dependency provenance gaps before they become a legal problem.</p>
 
 <p>These compositions are not optional add-ons stacked on top of a "real" harness. They are different shapes of the same idea, configured for what the team actually ships. The principle is consistent. The composition is not. And the only way any of these work is if the layers run in parallel, return structured outputs, and are owned by the right teams.</p>
 
@@ -1023,7 +1025,7 @@
       <div class="layers" id="layers"></div>
       <aside class="summary">
         <div class="summary-title">Your harness</div>
-        <div class="summary-row"><span class="k">Layers active</span><span class="v" id="sum-count">0 / 9</span></div>
+        <div class="summary-row"><span class="k">Layers active</span><span class="v" id="sum-count">0 / 0</span></div>
         <div class="summary-row"><span class="k">Wall time</span><span class="v" id="sum-time">~0 min</span></div>
         <div class="summary-row"><span class="k">Teams involved</span><span class="v" id="sum-teams">0</span></div>
         <div class="verdict">
@@ -1181,7 +1183,7 @@
 <footer>
   <div class="container">
     <p>Part II of the Agentic SDLC series.</p>
-    <p>Part I: <a href="/blog/the-validation-harness" target="_blank" rel="noopener">The Agentic SDLC</a></p>
+    <p>Part I: <a href="/blog/the-agentic-sdlc" target="_blank" rel="noopener">The Agentic SDLC</a></p>
     <p style="margin-top: 24px;">Written by <a href="https://amoshaviv.com" target="_blank" rel="noopener">Amos Haviv</a></p>
   </div>
 </footer>
@@ -1208,12 +1210,44 @@ const LAYERS = {
     time: 3,
     adversarial: false
   },
+  license: {
+    name: "License & SBOM",
+    desc: "OSS license compatibility, SBOM diff, copyleft contamination, dependency provenance. Sits next to the security layer but answers a different question: not 'is this safe to run' but 'is this safe to ship'.",
+    owner: "GRC / Legal Eng",
+    infra: "License DB + SBOM registry",
+    time: 1,
+    adversarial: false
+  },
   functional: {
     name: "Functional Validation",
     desc: "Boots an ephemeral sandbox, runs the change, drives it behaviorally with Playwright, records video, attaches the trace to the PR.",
     owner: "QA / SRE",
     infra: "Ephemeral sandbox at scale",
     time: 8,
+    adversarial: false
+  },
+  migration: {
+    name: "Data Migration Safety",
+    desc: "Schema migration linter, lock-time analysis, backfill safety on hot tables, NOT NULL adds, index rebuilds. Catches the migrations that pass review and brick production.",
+    owner: "Data Platform / DBA",
+    infra: "Shadow DB + lock simulator",
+    time: 3,
+    adversarial: false
+  },
+  a11y: {
+    name: "Accessibility (a11y)",
+    desc: "WCAG/ARIA conformance, focus order, color contrast, screen-reader flows. Increasingly a legal requirement — EAA bound consumer apps in the EU from June 2025, and ADA Title III suits keep climbing.",
+    owner: "Frontend Platform",
+    infra: "Headless browser + axe ruleset",
+    time: 2,
+    adversarial: false
+  },
+  design: {
+    name: "Design Regression",
+    desc: "Visual diffs across breakpoints, dark-mode parity, brand-token drift, layout shifts. Catches the UI regressions a passing test suite will not.",
+    owner: "Design Systems",
+    infra: "Screenshot baseline + render farm",
+    time: 4,
     adversarial: false
   },
   compliance: {
@@ -1240,6 +1274,14 @@ const LAYERS = {
     time: 4,
     adversarial: false
   },
+  observability: {
+    name: "Telemetry & Observability",
+    desc: "Verifies new code paths emit traces, metrics, and structured logs at the right cardinality. The layer that prevents silent prod regressions from looking like silence.",
+    owner: "Observability / SRE",
+    infra: "Trace schema registry",
+    time: 1,
+    adversarial: false
+  },
   redteam: {
     name: "Red-Team Agent",
     desc: "Generates exploit prompts, malformed inputs, privilege escalation attempts. Argues against the other validators from a permanent oppositional role.",
@@ -1247,6 +1289,14 @@ const LAYERS = {
     infra: "Adversarial corpus + constitution",
     time: 5,
     adversarial: true
+  },
+  docs: {
+    name: "Documentation Drift",
+    desc: "Public API docs, README, OpenAPI/JSON Schema, inline comments out of sync with the change. Catches the most common rot in long-lived projects and the easiest slop signal in AI-authored PRs.",
+    owner: "DevEx",
+    infra: "Docs index + diff",
+    time: 1,
+    adversarial: false
   },
   routing: {
     name: "Reviewer Routing",
@@ -1267,12 +1317,12 @@ const LAYERS = {
 };
 
 const PROFILES = {
-  websaas: ["standards", "security", "functional", "routing", "summarizer"],
-  fintech: ["standards", "security", "functional", "compliance", "behavioral", "routing", "summarizer"],
-  mobile: ["standards", "security", "compliance", "functional", "appstore", "routing", "summarizer"],
-  agentic: ["standards", "security", "functional", "redteam", "behavioral", "routing", "summarizer"],
-  games: ["standards", "security", "functional", "appstore", "behavioral", "routing", "summarizer"],
-  oss: ["standards", "security", "functional", "summarizer"]
+  websaas: ["standards", "security", "functional", "a11y", "observability", "routing", "summarizer"],
+  fintech: ["standards", "security", "functional", "migration", "compliance", "behavioral", "observability", "routing", "summarizer"],
+  mobile: ["standards", "security", "compliance", "functional", "a11y", "design", "appstore", "routing", "summarizer"],
+  agentic: ["standards", "security", "functional", "redteam", "behavioral", "observability", "routing", "summarizer"],
+  games: ["standards", "security", "functional", "design", "migration", "appstore", "behavioral", "routing", "summarizer"],
+  oss: ["standards", "security", "license", "functional", "docs", "summarizer"]
 };
 
 const VERDICTS = {
@@ -1349,7 +1399,7 @@ function pickVerdict() {
   if (profile === 'agentic' && !active.has('redteam')) return VERDICTS.no_redteam_agentic;
   if (!active.has('functional')) return VERDICTS.no_functional;
   if (!active.has('summarizer') && active.size >= 4) return VERDICTS.no_summary;
-  if (active.size >= 8 && active.has('redteam')) return VERDICTS.full_harness;
+  if (active.size >= 12 && active.has('redteam')) return VERDICTS.full_harness;
   if ((profile === 'fintech' || profile === 'mobile') && active.has('compliance') && !active.has('routing')) return VERDICTS.no_routing_regulated;
   if (profile === 'agentic' && active.has('redteam') && active.has('functional') && active.has('summarizer')) return VERDICTS.solid_agentic;
   if (profile === 'fintech' && active.has('compliance') && active.has('behavioral')) return VERDICTS.solid_fintech;
@@ -1369,7 +1419,7 @@ function renderSummary() {
   const time = parallelTime + (summarizer ? summarizer.time : 0);
   const teams = new Set(active.map(l => l.owner)).size;
 
-  document.getElementById('sum-count').textContent = `${active.length} / 9`;
+  document.getElementById('sum-count').textContent = `${active.length} / ${Object.keys(LAYERS).length}`;
   document.getElementById('sum-time').textContent = `~${time} min`;
   document.getElementById('sum-teams').textContent = teams;
 
