@@ -867,7 +867,7 @@
 <div class="container titleblock">
   <div class="kicker">A Field Guide for Engineering Leaders</div>
   <h1 class="title">The Anatomy of a <em>Validation Harness</em></h1>
-  <p class="standfirst">Code generation is cheap now. Trust is the bottleneck. Your AI review bot is a Jenkins from 2009, and the teams that figure out what comes next will be the ones whose AI-written code actually ships.</p>
+  <p class="standfirst">Code generation is cheap now. Trust is the bottleneck. The teams that figure out how to compose the validation layer together will be the ones whose AI-written code actually ships. We think about it as the new CI.</p>
   <div class="byline">
     <span>By Amos Haviv</span>
     <span>Reading time / 14 min</span>
@@ -885,9 +885,7 @@
 
   <p>Most teams' first answer to this has been to slap an AI review bot on the PR. CodeRabbit. Greptile. Bugbot. Diamond. GitHub Copilot Code Review. Anthropic's Claude Code Review. The bot reads the diff, leaves a summary, flags a few things. Done.</p>
 
-  <p>This is the wrong shape.</p>
-
-  <p>It is not the wrong direction. It is the wrong shape. What teams actually need is a <em>validation harness</em>, and the right way to think about a validation harness is to treat it like a CI platform. Many layers. Many specialized agents. Real infrastructure underneath. Different owners for different parts. The single-bot model is to the validation harness what a 2009 Jenkins box was to a modern internal developer platform.</p>
+  <p>It is not the wrong direction. It is the wrong shape. What teams actually need is a <em>validation harness</em>, and the right way to think about a validation harness is to treat it like a CI platform. Many layers. Many specialized agents. Real infrastructure underneath. Different owners for different parts. The single-bot model is to the validation harness what a 2009 Jenkins(I think it was still called Hudson) box was to a modern internal developer platform.</p>
 
   <p>Here is what that looks like.</p>
 </section>
